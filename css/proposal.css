@@ -1,0 +1,113 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+  scroll-behavior: smooth;
+  transition: all 0.3s ease-out;
+}
+
+p {
+  font-family: "Open Sans", sans-serif;
+}
+
+body {
+  margin: auto auto;
+  max-width: 1000px;
+  background-color: rgb(240, 240, 242);
+}
+
+main {
+  background-color: rgb(233, 233, 235);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+header,
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 10vh;
+  background-color: rgb(247, 105, 2);
+}
+
+header *,
+footer * {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+main div {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+main h1,
+main h2,
+main h3 {
+  margin-left: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+main div p {
+  margin: 20px 50px 20px 20px;
+  padding: 20px;
+  background-color: rgb(222, 222, 223);
+}
+
+main div p:hover {
+  margin: 20px 10px 20px 10px;
+  font-size: 150%;
+  padding: 20px;
+  background-color: rgb(211, 211, 211);
+}
+
+#mockups figure {
+  background-color: rgb(222, 222, 223);
+  padding: 20px;
+  margin: 20px 20px 20px 20px;
+
+  color: rgb(244, 244, 247);
+
+  transition-duration: 0.5s;
+}
+
+#mockups figure:hover {
+  background-color: rgb(155, 155, 155);
+}
+
+#mockups img {
+  width: 100%;
+  border: solid 2px rgb(15, 15, 15);
+  height: auto;
+
+  transition-duration: 0.5s;
+}
+
+#mockups img:hover {
+  filter: brightness(200%);
+}
+
+#mockups figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: content-box;
+  padding: 4px;
+  height: 40px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  background-color: rgb(66, 66, 66);
+
+  margin-top: 8px;
+  border-bottom: solid 10px rgb(44, 44, 44);
+}

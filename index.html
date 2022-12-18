@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIT Idle</title>
+    <link rel="stylesheet" href="css/game.css">
+</head>
+
+<body>
+    <header id="header">
+        <h1>RIT Idle beta 0.2</h1>
+    </header>
+
+    <div id="paused">
+        <div class="wrapper">
+            <p>Paused...</p>
+            <div class="button">Resume</div>
+        </div>
+    </div>
+
+    <main>
+        <div id="gameWindow">
+            <div id="gameTab-main" class="gameTab">
+                <div class="navbar">
+                    <ul>
+                        <li class="button study">Study</li>
+                        <li class="button train">Train</li>
+                        <li class="button save">Save</li>
+                        <li class="button pause">Pause</li>
+                        <li class="button reincarnate">Déjà vu</li>
+                    </ul>
+                </div>
+                <div id="attributes">
+                    <h2>Attributes</h2>
+                    <ul>
+                        <!-- Attribtues are generated here -->
+                    </ul>
+                </div>
+                <div id="upgrades">
+                    <h2>Upgrades</h2>
+                    <!-- Upgrades are generated here -->
+                    <div id="upgrades-form"></div>
+                </div>
+                <div id="courses">
+                    <h2>Courses</h2>
+                    <ul>
+                        <!-- Courses are generated here -->
+                    </ul>
+                </div>
+                <div id="combat">
+                    <!-- Combat graphics goes here... -->
+                    <div class="popupOverlay"></div>
+                </div>
+                <div id="info">
+                    <header>
+                        <h2>Info</h2>
+                        <ul>
+                            <li class="tigerSpirits">Tiger Spirits: <span>#</span></li>
+                            <li class="totalGameTime">Total Game Time: <span>#</span></li>
+                            <li class="reincarnationBonus">Reincarnation Bonus: <span>#</span></li>
+                        </ul>
+                    </header>
+                    <div id="infoBoard"></div>
+                </div>
+            </div>
+            <div id="gameTab-theater" class="gameTab">
+                <!-- TBD -->
+            </div>
+        </div>
+        <div id="idleBar">
+            <div class="progress"></div>
+        </div>
+    </main>
+
+    <footer id="footer">
+        <p>Zhao Jin, 2022</p>
+    </footer>
+
+
+    <!-- External libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.js"></script>
+    <!-- My JS Files -->
+    <script src="js/util.js"></script>
+    <script src="js/classes.js"></script>
+    <script src="js/sounds.js"></script>
+    <script src="js/course.js"></script>
+    <script src="js/attribute.js"></script>
+    <script src="js/upgrade.js"></script>
+    <script src="js/popup.js"></script>
+    <script src="js/activityTracker.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

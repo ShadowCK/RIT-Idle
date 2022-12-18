@@ -1,0 +1,618 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap");
+
+.button {
+  display: flex;
+  justify-content: center;
+  background-color: rgb(247, 102, 5);
+  border-radius: 5px;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+
+  filter: drop-shadow(0 0 1px rgb(237, 110, 7))
+    drop-shadow(2px 2px 3px rgb(65, 65, 65));
+}
+
+.button:hover {
+  background-color: rgb(255, 163, 101);
+}
+
+.button:active {
+  background-color: rgb(255, 235, 145);
+  color: black;
+}
+
+@keyframes rainbow {
+  0% {
+    color: red;
+  }
+  20% {
+    color: orange;
+  }
+  40% {
+    color: yellow;
+  }
+  60% {
+    color: green;
+  }
+  80% {
+    color: blue;
+  }
+  100% {
+    color: purple;
+  }
+}
+
+@keyframes indicator {
+  0% {
+    color: black;
+  }
+  100% {
+    color: white;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+  scroll-behavior: smooth;
+  transition: all 0.3s ease-out;
+  list-style: none;
+  color: rgb(247, 105, 2);
+  word-wrap: break-word;
+  /* Prevents the user from selecting some text by accident */
+  user-select: none;
+}
+
+@keyframes body {
+  0% {
+    background-color: rgb(247, 105, 2);
+  }
+
+  50% {
+    background-color: rgb(255, 180, 95);
+  }
+
+  100% {
+    background-color: rgb(255, 243, 181);
+  }
+}
+body {
+  /* background-color: rgb(248, 248, 249); */
+  animation: body 60s linear infinite alternate;
+  overflow: hidden;
+}
+
+#header {
+  width: 100%;
+  position: absolute;
+  top: min(calc((100vh - 720px) / 4 - 20px), 60px);
+
+  display: flex;
+  justify-content: center;
+}
+
+#header h1 {
+  color: white;
+  text-shadow: 0 0 5px #4b4b4b;
+}
+
+#footer {
+  width: 100%;
+  position: absolute;
+  bottom: min(calc((100vh - 720px) / 4 - 20px), 60px);
+
+  display: flex;
+  justify-content: center;
+}
+
+#footer p {
+  color: rgb(218, 218, 218);
+  text-shadow: 0 0 3px #fef3f3;
+  filter: drop-shadow(0 0 4px rgba(255, 252, 249, 0.6))
+    drop-shadow(0 0 6px rgb(58, 24, 3))
+    drop-shadow(0 0 10px rgba(255, 154, 71, 0.6));
+}
+
+#gameWindow {
+  box-sizing: content-box;
+  width: 1280px;
+  height: 720px;
+  margin: calc((100vh - 720px) / 2 - 5px) auto 0 auto;
+  border: solid 5px black;
+  border-radius: 8px;
+  background-color: rgb(206, 206, 206);
+}
+
+#gameWindow:hover {
+  background-color: rgb(229, 229, 229);
+
+  filter: drop-shadow(0 0 4px rgb(39, 39, 39))
+    drop-shadow(0 0 8px rgba(99, 99, 99, 0.4))
+    drop-shadow(0 0 20px rgba(255, 252, 249, 0.3))
+    drop-shadow(0 0 40px rgba(255, 150, 65, 0.2));
+}
+
+#gameWindow:has(:hover:not(.gameTab)) {
+  background-color: rgb(242, 242, 242);
+}
+
+/* Children and navbar should also have some border-radii to be consistent with gameWindow */
+#gameWindow > * {
+  border-radius: 8px;
+}
+
+.navbar {
+  border-radius: 3px;
+}
+
+#gameTab-main {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 4fr 18fr 18fr;
+  grid-template-areas:
+    "navbar navbar navbar"
+    "courses attributes upgrades"
+    "combat combat info";
+}
+
+#courses,
+#attributes,
+#upgrades,
+#combat,
+#info {
+  border: solid 2px black;
+  margin: 10px 20px;
+  padding: 5px;
+  overflow-y: scroll;
+  background-color: rgb(255, 255, 255);
+}
+
+#courses:hover,
+#attributes:hover,
+#upgrades:hover,
+#combat:hover,
+#info:hover {
+  background-color: rgb(233, 233, 233);
+}
+
+.navbar {
+  margin: 0px 0px 5px 0px;
+  grid-area: navbar;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  background-color: rgb(130, 134, 135);
+  border-bottom: solid 3px black;
+}
+
+.navbar:hover {
+  background-color: rgb(243, 254, 255);
+  transition: all 0.4s ease-out;
+  margin-bottom: 0px;
+  box-sizing: content-box;
+  padding: 20px 0 20px 0px;
+  border-bottom: solid 3px rgb(67, 67, 67);
+  filter: drop-shadow(0px 3px 2px rgb(155, 155, 155));
+}
+
+.navbar ul {
+  margin: 0 20px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.navbar li {
+  max-width: 10%;
+  margin: 0 6px;
+}
+
+#courses {
+  grid-area: courses;
+}
+
+#upgrades {
+  grid-area: upgrades;
+}
+
+#attributes {
+  grid-area: attributes;
+}
+
+#combat {
+  grid-area: combat;
+  position: relative;
+  overflow: hidden;
+  background: url("../images/combat.png") no-repeat center;
+  background-size: cover;
+}
+
+#info {
+  grid-area: info;
+  overflow: hidden;
+}
+
+.course,
+.attribute {
+  /* box-sizing: border-box;
+  margin: 7px 10px; */
+  box-sizing: content-box;
+  padding: 7px 10px;
+  display: grid;
+  grid-template-rows: 1fr 3fr;
+  grid-template-areas:
+    "text"
+    "bar";
+  height: 50px;
+}
+
+.course:hover,
+.attribute:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.course .text,
+.attribute .text {
+  grid-area: text;
+}
+
+.course .bar,
+.attribute .bar {
+  grid-area: bar;
+  border: solid 2px black;
+  background-color: gray;
+  filter: drop-shadow(4px 4px 2px #cfcfcf);
+}
+
+.course .bar:hover,
+.attribute .bar:hover {
+  background-color: rgb(188, 188, 188);
+  filter: drop-shadow(4px 4px 2px rgb(155, 155, 155));
+}
+
+.course[data-active="true"] .bar,
+.attribute[data-active="true"] .bar {
+  background-color: orange;
+}
+
+.progress {
+  height: 100%;
+  transition-duration: 0s;
+  grid-area: bar;
+  background-color: green;
+  filter: drop-shadow(0 0 2px rgba(9, 64, 2, 0.6));
+}
+
+.course .text {
+  font-size: 1.2em;
+  color: rgb(45, 37, 166);
+  font-weight: bold;
+}
+
+.course[data-course="Capstone"] .text {
+  animation: rainbow 5s linear infinite alternate;
+}
+
+/* Indicator for the speed multiplier */
+.course .indicator {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  animation: indicator 2s linear infinite alternate;
+  font-weight: bold;
+
+  z-index: 100;
+}
+
+.attribute .text {
+  font-size: 1.2em;
+  color: rgb(255, 42, 53);
+  font-weight: bold;
+}
+
+.attribute.influential .text{
+  color: rgb(11, 58, 0);
+}
+
+#upgrades-form {
+  height: fit-content;
+  display: grid;
+  padding: 10px;
+  gap: 20px;
+  /* Note: the repeat dimensions should be consistent with upgrade's frame dimensions */
+  grid-template-columns: repeat(auto-fit, 100px);
+  grid-template-rows: repeat(auto-fit, 100px);
+  grid-auto-flow: row;
+}
+
+.upgrade {
+  width: 100px;
+  height: 100px;
+  background-color: #8a8a7f;
+  border: solid 2px black;
+
+  position: relative;
+}
+
+.upgrade:hover {
+  background-color: rgb(79, 79, 79);
+  border: solid 2px rgb(230, 230, 230);
+}
+
+.upgrade[data-cannot-afford] {
+  background-color: #af100b;
+}
+
+.upgrade[data-bought="true"] {
+  background-color: #2fc418;
+}
+
+@keyframes overlay {
+  0% {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0.9;
+  }
+
+  48% {
+    opacity: 0.5;
+  }
+
+  68% {
+    opacity: 0.1;
+  }
+
+  90% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+.upgrade .overlay {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+
+  position: absolute;
+  animation: overlay 5s infinite alternate;
+}
+
+/* Scroll Bar */
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+#infoBoard::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #4f4f4f;
+  border-radius: 2px;
+}
+
+#infoBoard::-webkit-scrollbar-track {
+  box-shadow: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(79, 79, 79);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #8a8a7f;
+}
+
+#info {
+  display: grid;
+  grid-template-rows: 1fr 2fr;
+}
+
+#info header {
+  margin: 20px;
+}
+
+#info ul > * {
+  color: rgb(82, 82, 82);
+  font-weight: bold;
+}
+
+#infoBoard {
+  margin: 10px;
+  background-color: rgb(224, 224, 224);
+  border-radius: 4px;
+  padding: 10px;
+  color: rgb(82, 82, 82);
+  font-weight: bold;
+  font-size: 0.9em;
+  filter: drop-shadow(4px 4px 4px #4b4b4b) drop-shadow(5px 5px 6px #868686);
+
+  overflow-y: scroll;
+
+  /* Can't be smooth in this case. Refer to scrollInfoBoard() */
+  scroll-behavior: auto;
+}
+
+#infoBoard .option-value {
+  color: rgb(12, 102, 33);
+}
+
+.popupOverlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  left: 0;
+  top: 0;
+  position: absolute;
+}
+
+.popup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+
+  max-width: 60%;
+
+  background-color: rgb(253, 255, 225);
+  transition: none;
+  padding: 20px;
+  border-radius: 10px;
+  filter: drop-shadow(4px 4px 4px #4b4b4b) drop-shadow(5px 5px 6px #868686);
+}
+
+.popup .text {
+  color: rgb(247, 102, 5);
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.popup.important {
+  font-size: 1.2em;
+  background-color: #363636;
+  z-index: 100;
+}
+
+.popup.important .text {
+  color: white;
+}
+
+.drop {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  z-index: -10000;
+}
+
+#paused {
+  /* This won't provide any transition so NO */
+  /* visibility: hidden; */
+
+  /* Opacity is very good */
+  opacity: 0;
+  /* Because it's not hidden, just invisible, Use z-index to avoid blocking elements */
+  z-index: -1000;
+
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  left: 0;
+  top: -125px;
+}
+
+#paused[data-paused] {
+  /* visibility: visible; */
+  opacity: 1;
+  z-index: 10000;
+}
+
+#paused .wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.95);
+  width: 100vw;
+  height: 30vh;
+}
+
+#paused p {
+  max-width: 60vw;
+  margin-top: 20px;
+  font-size: 5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+#paused .button {
+  margin-top: 30px;
+  width: 200px;
+}
+
+@keyframes reincarnate {
+  0% {
+    background-color: red;
+  }
+  20% {
+    background-color: orange;
+  }
+  40% {
+    background-color: yellow;
+    color: black;
+  }
+  60% {
+    background-color: green;
+  }
+  80% {
+    background-color: blue;
+  }
+  100% {
+    background-color: purple;
+  }
+}
+
+.button.reincarnate {
+  animation: reincarnate 20s infinite alternate;
+  font-weight: bold;
+}
+
+.button.reincarnate:hover {
+  animation: reincarnate 20s infinite alternate-reverse;
+}
+
+#idleBar {
+  margin: 5px auto 0 auto;
+  width: 1280px;
+  height: 10px;
+
+  background-color: rgba(255, 255, 255, 0.2);
+  position: relative;
+  border-radius: 8px;
+}
+
+#idleBar .progress {
+  margin: 0 auto;
+  /* background-color: rgba(66, 66, 66, 0.9); */
+  background: linear-gradient(
+    to bottom,
+    rgba(88, 88, 88, 0.7) 0%,
+    rgba(77, 77, 77, 0.82) 10%,
+    rgba(55, 55, 55, 0.82) 90%,
+    rgba(44, 44, 44, 0.95) 100%
+  );
+  border-radius: 8px;
+  transition-duration: 0.1s;
+}
