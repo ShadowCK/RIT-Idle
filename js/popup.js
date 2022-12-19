@@ -1,28 +1,5 @@
 const popups = [];
 
-function createPopUp(
-  parentElement,
-  message,
-  duration,
-  offset,
-  direction,
-  speed
-) {
-  let index = popups.length;
-  let popup = new PopUp(
-    index,
-    parentElement,
-    message,
-    duration,
-    offset,
-    direction,
-    speed
-  );
-  popups.push(popup);
-
-  return popup;
-}
-
 /**
  * a pop-up message with a HTML Element parent.
  */
@@ -90,8 +67,42 @@ class PopUp {
 
   /**
    * Has a different visualization if important.
+   * @deprecated Use addTag() which is more general.
    */
   markAsImportant() {
     this.selfElement.classList.add("important");
+    return this;
   }
+
+  /**
+   * Adds a class to the popup element
+   * @param {string} tag HTML class name
+   */
+  addTag(tag) {
+    this.selfElement.classList.add(tag);
+    return this;
+  }
+}
+
+function createPopUp(
+  parentElement,
+  message,
+  duration,
+  offset,
+  direction,
+  speed
+) {
+  let index = popups.length;
+  let popup = new PopUp(
+    index,
+    parentElement,
+    message,
+    duration,
+    offset,
+    direction,
+    speed
+  );
+  popups.push(popup);
+
+  return popup;
 }
