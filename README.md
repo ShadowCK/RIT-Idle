@@ -77,8 +77,12 @@ This is an idle game where you play as a freshman in <abbr title="Rochester Inst
 
 ## Deployment & Tryout
 
-You are more than welcome to download and host the web files on your own PC (probably VSCode + [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) Extension.)
+### Try it online
 
-However, I know that's **less convenient** to try out a game. Currently, the [test version](https://people.rit.edu/zj5148/235/project3/) is hosted on RIT's <abbr title="people.rit.edu">[Banjo](https://people.rit.edu/)</abbr> server. They are not guarenteed to be up-to-date. I'll change them to be using Github Pages so I won't need to manually update them on a <abbr title="i.e. Banjo">different service</abbr>.
+The [**game**](https://shadowck.github.io/RIT-Idle/) is hosted on **Github Pages**. You can also find the [**documentation**](https://shadowck.github.io/RIT-Idle/documentation) here.
 
-You can also find the documentation [Here](https://people.rit.edu/zj5148/235/project3/documentation.html).
+Deployment is **NOT** needed if you are going this way.
+
+### Host locally
+
+Besides, you are more than welcome to download and host the web files on your own PC (probably [VSCode](https://code.visualstudio.com/download) + [Live Server Extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).)
