@@ -43,11 +43,17 @@ class Course {
     this.speedMultiplierCap = this.maxProgress / this.maxProgressCap;
     this.getProgressPercentage = getProgressPercentage;
 
+    this.element = null;
     this.active = false;
 
     // Details
     this.courseTitle = "Unknown";
     this.description = "A course that you may take.";
+    this.preReqs = [];
+  }
+
+  static valueOf() {
+    return this.name;
   }
 
   /**
@@ -98,9 +104,73 @@ class Course {
     }
   }
 
+  /**
+   * Sets the course title and description for display purpose.
+   * @param {*} courseTitle Course title.
+   * @param {*} description Course description.
+   * @returns this
+   */
   setDetails(courseTitle, description) {
     this.courseTitle = courseTitle;
     this.description = description;
     return this;
+  }
+
+  /**
+   * Adds pre requisites for the course.
+   * @param  {...string} keys names of the pre-requisite courses.
+   * @returns this
+   */
+  addPreReq(...keys) {
+    for (const courseKey of keys) {
+      // Do no store a course multiple times
+      if (this.preReqs.includes(courseKey)) continue;
+
+      this.preReqs.push(courseKey);
+    }
+    return this;
+  }
+
+  /**
+   * @returns Whether this course has pre-requisite courses.
+   */
+  hasPreReq() {
+    return this.preReqs.length > 0;
+  }
+
+  /**
+   * Change the strings in the preReq array to be real Course objects.
+   */
+  linkPreReqs() {
+    for (let i = 0; i < this.preReqs.length; i++) {
+      const item = this.preReqs[i];
+      if (typeof item === "string") {
+        if (courses[item]) {
+          this.preReqs[i] = courses[item];
+        } else {
+          console.log(`${item} is not a valid course name.`);
+          this.preReqs.splice(i, 1);
+        }
+      }
+    }
+  }
+}
+
+class CourseManager {
+  static _instance = null;
+  static get instance() {
+    if (!this._instance) {
+      this._instance = new CourseManager();
+    }
+    return this._instance;
+  }
+
+  constructor() {
+    // Prevents any manual constructor call bypassing the instance() getter.
+    if (!CourseManager.instance) {
+      // Object properties
+    }
+
+    return CourseManager.instance;
   }
 }

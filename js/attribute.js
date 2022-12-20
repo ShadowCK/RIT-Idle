@@ -26,10 +26,11 @@ class Attribute {
     this.progress = 0;
     this.maxProgress = 5;
     this.getProgressPercentage = getProgressPercentage;
+
+    this.element = null;
     this.active = false;
 
     this.description = "An attribute that benefits you in various ways.";
-
     this.influential = false;
   }
 

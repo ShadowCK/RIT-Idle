@@ -29,6 +29,8 @@ class Upgrade {
     this.tier = 0;
     this.pricePower = pricePower;
     this.valuePower = valuePower;
+
+    this.element = null;
   }
 
   /**

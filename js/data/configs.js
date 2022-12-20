@@ -94,11 +94,13 @@ const courseConfigs = {
     [3, 1.5, 1.5],
     30,
     2
-  ).setDetails(
-    `Game Development and Algorithmic Problem Solving II`,
-    `This course furthers the exploration of problem solving, abstraction, and algorithmic design.  Students apply the object-oriented paradigm of software development, with emphasis upon fundamental concepts of encapsulation, inheritance, and polymorphism.  In addition, object structures and class relationships comprise a key portion of the analytical process including the exploration of problem structure and refactoring.  Intermediate concepts in software design including GUIs, threads, events, networking, and advanced APIs are also explored.  Students are also introduced to data structures, algorithms, exception handling and design patterns that are relevant to the construction of game systems.
+  )
+    .setDetails(
+      `Game Development and Algorithmic Problem Solving II`,
+      `This course furthers the exploration of problem solving, abstraction, and algorithmic design.  Students apply the object-oriented paradigm of software development, with emphasis upon fundamental concepts of encapsulation, inheritance, and polymorphism.  In addition, object structures and class relationships comprise a key portion of the analytical process including the exploration of problem structure and refactoring.  Intermediate concepts in software design including GUIs, threads, events, networking, and advanced APIs are also explored.  Students are also introduced to data structures, algorithms, exception handling and design patterns that are relevant to the construction of game systems.
   `
-  ),
+    )
+    .addPreReq("IGME-105"),
   "IGME-110": new Course(
     "IGME-110",
     [attributeKeys.aesthetics, attributeKeys.creativity],
@@ -132,33 +134,39 @@ const courseConfigs = {
     [15, 5, 5, 5],
     200,
     4
-  ).setDetails(
-    `Interactive Media Development`,
-    `In this course, students will learn to create visually rich interactive experiences. It is a course in programming graphics and media, but it is also a course on the relationship between ideas and code. Students will explore topics in math and physics by building programs that simulate and visualize processes in the natural world. Assignments will include major programming projects, such as building a virtual world inhabited by digital creatures that display observable behaviors.
+  )
+    .setDetails(
+      `Interactive Media Development`,
+      `In this course, students will learn to create visually rich interactive experiences. It is a course in programming graphics and media, but it is also a course on the relationship between ideas and code. Students will explore topics in math and physics by building programs that simulate and visualize processes in the natural world. Assignments will include major programming projects, such as building a virtual world inhabited by digital creatures that display observable behaviors.
   `
-  ),
+    )
+    .addPreReq("IGME-106", "MATH-185"),
   "IGME-209": new Course(
     "IGME-209",
     [attributeKeys.programming, attributeKeys.physics, attributeKeys.math],
     [20, 10, 10],
     300,
     4
-  ).setDetails(
-    `Data Structures & Algorithms for Games & Simulations I`,
-    `This course focuses upon the application of data structures, algorithms, and fundamental Newtonian physics to the development of video game applications, entertainment software titles, and simulations.  Topics covered include 3D coordinate systems and the implementation of affine transformations, geometric primitives, and efficient data structures and algorithms for real-time collision detection. Furthermore, Newtonian mechanics principles will be examined in the context of developing game and entertainment software where they will be applied to compute the position, velocity and acceleration of a point-mass subject to forces and the conservation of momentum and energy.  Programming assignments are a required part of this course.
+  )
+    .setDetails(
+      `Data Structures & Algorithms for Games & Simulations I`,
+      `This course focuses upon the application of data structures, algorithms, and fundamental Newtonian physics to the development of video game applications, entertainment software titles, and simulations.  Topics covered include 3D coordinate systems and the implementation of affine transformations, geometric primitives, and efficient data structures and algorithms for real-time collision detection. Furthermore, Newtonian mechanics principles will be examined in the context of developing game and entertainment software where they will be applied to compute the position, velocity and acceleration of a point-mass subject to forces and the conservation of momentum and energy.  Programming assignments are a required part of this course.
   `
-  ),
+    )
+    .addPreReq("IGME-106"),
   "IGME-219": new Course(
     "IGME-219",
     [attributeKeys.aesthetics, attributeKeys.physics, attributeKeys.creativity],
     [20, 10, 20],
     400,
     4
-  ).setDetails(
-    `3D Animation and Asset Production`,
-    `This course provides an overview of 3D game asset production. Basic ideas learned within the first asset production course are also revisited within the 3D environs. Topics covered include modeling, texturing, skinning and animation. Emphasis is put on low polygon modeling techniques, best practices in game art production, and effective communication strategies between artists, programmers and designers.
+  )
+    .setDetails(
+      `3D Animation and Asset Production`,
+      `This course provides an overview of 3D game asset production. Basic ideas learned within the first asset production course are also revisited within the 3D environs. Topics covered include modeling, texturing, skinning and animation. Emphasis is put on low polygon modeling techniques, best practices in game art production, and effective communication strategies between artists, programmers and designers.
   `
-  ),
+    )
+    .addPreReq("IGME-119"),
   "IGME-220": new Course(
     "IGME-220",
     [
@@ -185,23 +193,27 @@ const courseConfigs = {
     [30, 30, 40, 30],
     800,
     5
-  ).setDetails(
-    `Intro to Game Web Tech`,
-    `This course introduces web technologies commonly used in the production and distribution of both content focused web sites, and in the creation of interactive applications and games. Students will create web sites and web-native interactive experiences, and publish them to the web. Programming projects are required.
+  )
+    .setDetails(
+      `Intro to Game Web Tech`,
+      `This course introduces web technologies commonly used in the production and distribution of both content focused web sites, and in the creation of interactive applications and games. Students will create web sites and web-native interactive experiences, and publish them to the web. Programming projects are required.
   `
-  ),
+    )
+    .addPreReq("IGME-106", "IGME-110"),
   "IGME-236": new Course(
     "IGME-236",
     [attributeKeys.aesthetics, attributeKeys.social, attributeKeys.mentality],
     [60, 30, 40],
     800,
     5
-  ).setDetails(
-    `Experience Design for Games & Media
+  )
+    .setDetails(
+      `Experience Design for Games & Media
   `,
-    `This course examines the concepts of interface and interaction models in a media-specific context, with particular emphasis on the concept of the immersive interface.  This course explores concepts such as perception, expectation, Gestalt Theory, interactivity, Semiotics, presence, and immersion in the context of media application development and deployment.  In addition, underlying concepts of cognitive psychology and cognitive science will be integrated where appropriate.  These theories are then integrated in the exploration of the immersive interface, and with related concepts such as user-level-interface modification, augmentation of identity, and the interface as a social catalyst.
+      `This course examines the concepts of interface and interaction models in a media-specific context, with particular emphasis on the concept of the immersive interface.  This course explores concepts such as perception, expectation, Gestalt Theory, interactivity, Semiotics, presence, and immersion in the context of media application development and deployment.  In addition, underlying concepts of cognitive psychology and cognitive science will be integrated where appropriate.  These theories are then integrated in the exploration of the immersive interface, and with related concepts such as user-level-interface modification, augmentation of identity, and the interface as a social catalyst.
   `
-  ),
+    )
+    .addPreReq("IGME-106", "IGME-110"),
   "IGME-309": new Course(
     "IGME-309",
     [
@@ -213,10 +225,12 @@ const courseConfigs = {
     [100, 50, 50, 75],
     1500,
     8
-  ).setDetails(
-    `Data Structures & Algorithms for Games & Simulations II`,
-    `This course continues the investigation into the application of data structures, algorithms, and fundamental Newtonian mechanics required for the development of video game applications, simulations, and entertainment software titles.  Topics covered include quaternion representation of orientation and displacement, cubic curves and surfaces, classifiers, recursive generation of geometric structures, texture mapping, and the implementation of algorithms within game physics engines for collision detection and collision resolution of rigid bodies, and the numerical integration of the equations of motion. In addition, advanced data structures such as B+ trees and graphs will be investigated from the context of game application and entertainment software development.  Programming assignments are a requirement for this course.`
-  ),
+  )
+    .setDetails(
+      `Data Structures & Algorithms for Games & Simulations II`,
+      `This course continues the investigation into the application of data structures, algorithms, and fundamental Newtonian mechanics required for the development of video game applications, simulations, and entertainment software titles.  Topics covered include quaternion representation of orientation and displacement, cubic curves and surfaces, classifiers, recursive generation of geometric structures, texture mapping, and the implementation of algorithms within game physics engines for collision detection and collision resolution of rigid bodies, and the numerical integration of the equations of motion. In addition, advanced data structures such as B+ trees and graphs will be investigated from the context of game application and entertainment software development.  Programming assignments are a requirement for this course.`
+    )
+    .addPreReq("IGME-209", "MATH-181", "MATH-185", "PHYS-111"),
   "IGME-320": new Course(
     "IGME-320",
     [
@@ -228,10 +242,12 @@ const courseConfigs = {
     [100, 60, 60, 60],
     2000,
     8
-  ).setDetails(
-    `Game Design & Development II`,
-    `This course continues to examine the core theories of game design as they relate to the professional field.   Beginning with a formalized pitch process, this course examines the design and development paradigm from story-boarding and pre-visualization through rapid iteration, refinement, and structured prototyping exercises to further examine the validity of a given design.  Specific emphasis is placed on iterative prototyping models, and on methodologies for both informal and formal critique.  This course also explores production techniques and life-cycle in the professional industry.`
-  ),
+  )
+    .setDetails(
+      `Game Design & Development II`,
+      `This course continues to examine the core theories of game design as they relate to the professional field.   Beginning with a formalized pitch process, this course examines the design and development paradigm from story-boarding and pre-visualization through rapid iteration, refinement, and structured prototyping exercises to further examine the validity of a given design.  Specific emphasis is placed on iterative prototyping models, and on methodologies for both informal and formal critique.  This course also explores production techniques and life-cycle in the professional industry.`
+    )
+    .addPreReq("IGME-202", "IGME-220"),
   "IGME-330": new Course(
     "IGME-330",
     [
@@ -243,10 +259,12 @@ const courseConfigs = {
     [120, 80, 80, 80],
     2500,
     8
-  ).setDetails(
-    `Rich Media Web Application Development I`,
-    `This course provides students the opportunity to explore the design and development of media-rich web applications that utilize both static and procedurally manipulated media such as text, images and audio. This course examines client and server-side web development and features common to such applications.  Issues explored include framework characteristics, information management, presentation, interactivity, persistence, and data binding. Programming projects are required.`
-  ),
+  )
+    .setDetails(
+      `Rich Media Web Application Development I`,
+      `This course provides students the opportunity to explore the design and development of media-rich web applications that utilize both static and procedurally manipulated media such as text, images and audio. This course examines client and server-side web development and features common to such applications.  Issues explored include framework characteristics, information management, presentation, interactivity, persistence, and data binding. Programming projects are required.`
+    )
+    .addPreReq("IGME-235"),
   "IGME-531": new Course(
     "IGME-531",
     [
@@ -260,11 +278,13 @@ const courseConfigs = {
     [150, 150, 60, 60, 150, 10],
     5000,
     10
-  ).setDetails(
-    `Aesthetics and Computation`,
-    `Students will design and build creative applications, while studying the history of computation in the visual arts, music, and other relevant areas. Technical topics include advanced audiovisual programming techniques, while theoretical topics include foundational discussions on artificial life, generative art, microsound, participatory and process-based art, programming as performance, and computational creativity. Individual and/or group projects will be required.
+  )
+    .setDetails(
+      `Aesthetics and Computation`,
+      `Students will design and build creative applications, while studying the history of computation in the visual arts, music, and other relevant areas. Technical topics include advanced audiovisual programming techniques, while theoretical topics include foundational discussions on artificial life, generative art, microsound, participatory and process-based art, programming as performance, and computational creativity. Individual and/or group projects will be required.
   `
-  ),
+    )
+    .addPreReq("IGME-330"),
   Capstone: new Course(
     "Capstone",
     [

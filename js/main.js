@@ -26,7 +26,7 @@ const tigerSpirit_key = "tiger spirit";
 
 let averageTigerSpiritPerSecond;
 const averageTigerSpiritPerSecond_key = "average tiger spirit per second";
-const tigerSpiritIncomeTracker = [];
+let tigerSpiritIncomeTracker = [];
 
 let reincarnations;
 let reincarnations_key = "reincarnations";
@@ -261,152 +261,6 @@ function init() {
 }
 
 /**
- * Loads the game from LocalStorage, before creating HTML elements.
- */
-function loadGame_beforeHTML() {
-  // No value stored, assigns a default value (as of first run)
-  totalGameTime = loadFloat_keep(totalGameTime_key, totalGameTime, 0);
-
-  // We don't want tiger spirits to be kept across reincarnations.
-  tigerSpirit = loadFloat(tigerSpirit_key, 0);
-
-  lastSaveTimestamp = loadInt_keep(
-    lastSaveTimestamp_key,
-    lastSaveTimestamp,
-    Date.now()
-  );
-
-  // TODO: We can actually store the history highest of a single run (every reincarnation,)
-  // so even if the player is offline with no course running, they will get reasonable rewards.
-  averageTigerSpiritPerSecond = loadFloat(averageTigerSpiritPerSecond_key, 0);
-
-  reincarnations = loadInt_keep(reincarnations_key, reincarnations, 0);
-
-  reincarnateBonus = loadFloat_keep(reincarnateBonus_key, reincarnateBonus, 1);
-
-  // Loads attributes
-  for (const _key in attributeKeys) {
-    // "_key" is dictionary (object literal) key. "key" is attribute key/name. They may be the same but this step is essential.
-    const key = attributeKeys[_key];
-    attributes[key] = loadObj(new Attribute(), key, attributeConfigs[key]);
-  }
-  // Loads courses
-  for (const key in courseConfigs) {
-    courses[key] = loadObj(new Course(), key, courseConfigs[key]);
-  }
-
-  // Loads upgrades
-  for (const _key in upgradeConfigs) {
-    const key = upgradeConfigs[_key].name;
-    upgrades[key] = loadObj(new Upgrade(), key, upgradeConfigs[_key]);
-  }
-}
-
-/**
- * Initializes HTML Elements
- */
-function initializeHTML() {
-  createAttributes();
-  createCourses();
-  createUpgrades();
-}
-
-/**
- * Deletes all generated game-related HTML elements and generate them again.
- */
-function resetHTML() {
-  function removeAllChildren(parentElement) {
-    while (parentElement.firstChild) {
-      parentElement.removeChild(parentElement.firstChild);
-    }
-  }
-
-  removeAllChildren(HTMLAttributes);
-  removeAllChildren(HTMLCourses);
-  removeAllChildren(HTMLUpgrades);
-
-  initializeHTML();
-}
-
-/**
- * Loads the game from LocalStorage, after creating HTML elements.
- * (for those that depend on/interact with/manage HTML elements)
- */
-function loadGame_afterHTML() {
-  activeCourseName = localStorage.getItem(activeCourseName_key);
-  if (activeCourseName) {
-    setActiveCourse(activeCourseName);
-  }
-  activeAttributeName = localStorage.getItem(activeAttributeName_key);
-  if (activeAttributeName) {
-    setActiveAttribute(activeAttributeName);
-  }
-
-  // Because loading takes place before any game loop (where updateInfo() is called),
-  // we want the player to already be able to see their tiger spirits and stuff!
-  updateInfo();
-}
-
-/**
- * Saves the game to LocalStorage.
- */
-function saveGame() {
-  localStorage.setItem(totalGameTime_key, totalGameTime);
-  localStorage.setItem(tigerSpirit_key, tigerSpirit);
-  lastSaveTimestamp = Date.now();
-  localStorage.setItem(lastSaveTimestamp_key, lastSaveTimestamp);
-  localStorage.setItem(
-    averageTigerSpiritPerSecond,
-    averageTigerSpiritPerSecond_key
-  );
-  localStorage.setItem(reincarnations_key, reincarnations);
-  localStorage.setItem(reincarnateBonus_key, reincarnateBonus);
-
-  // Saves attributes
-  for (const attributeKey in attributes) {
-    const attribute = attributes[attributeKey];
-    localStorage.setItem(attribute.name, JSON.stringify(attribute));
-  }
-  // Saves courses
-  for (const courseKey in courses) {
-    const course = courses[courseKey];
-    localStorage.setItem(course.name, JSON.stringify(course));
-  }
-  // Saves upgrades
-  for (const upgradeKey in upgrades) {
-    const upgrade = upgrades[upgradeKey];
-    localStorage.setItem(upgrade.name, JSON.stringify(upgrade));
-  }
-
-  // Saves active course and attribute
-  localStorage.setItem(activeCourseName_key, activeCourseName);
-  localStorage.setItem(activeAttributeName_key, activeAttributeName);
-
-  //console.log(`Game Saved @ ${new Date()}`);
-}
-
-/**
- * Saves the game and creates a popup to remind player
- */
-function saveGame_notify() {
-  saveGame();
-  let currentDate = new Date();
-  // let time = currentDate.toTimeString();
-  // time = time.substring(0, time.indexOf("GMT"));
-  let time = currentDate.toLocaleTimeString();
-  let date = currentDate.toLocaleDateString();
-
-  createPopUp(
-    combatPopupOverlay,
-    `Game Saved at ${time} ${date}`,
-    3,
-    randomCoordinate(50, 150, 20, 60),
-    { x: 0, y: -1 },
-    10
-  ).markAsImportant();
-}
-
-/**
  * Continuously updates game data and graphics!
  * @param {*} realtimeSinceStartup time since the page is loaded
  */
@@ -512,6 +366,9 @@ function createAttributes() {
     li.appendChild(frameBar);
     li.appendChild(text);
     HTMLAttributes.appendChild(li);
+
+    // Adds the element to the attribute
+    attribute.element = li;
   }
 }
 
@@ -528,13 +385,27 @@ function createCourses() {
     li.addEventListener("mouseenter", (e) => {
       let info = `<span style="color:rgb(15,15,155)">${
         course.courseTitle
-      }</span><br><br>Reward: <span class="option-value">${formatNumber(
+      }</span><br><br>
+      Reward: <span class="option-value">${formatNumber(
         course.tigerSpiritReward
       )} Tiger Spirits</span><br>Standard Completion Time: <span class="option-value">${
         course.maxProgress
       }s</span><br>Speed Cap: <span class="option-value">${formatNumber(
         course.speedMultiplierCap
       )}X</span><br>`;
+      // Pre-Reqs
+      let preReqsCount = course.preReqs.length;
+      if (preReqsCount > 0) {
+        info += "Pre-Reqs: ";
+        for (let i = 0; i < preReqsCount; i++) {
+          const preReqCourse = course.preReqs[i];
+          info +=
+            i < lastIndex(course.preReqs)
+              ? `<span class="option-value">${preReqCourse.name}</span>, `
+              : `<span class="option-value">${preReqCourse.name}</span><br>`;
+        }
+      }
+      // Attribute requirements
       let length = course.reqAttributeNames.length;
       for (let i = 0; i < length; ) {
         info += `Req. <span>${capitalizeFirstChar(
@@ -577,6 +448,9 @@ function createCourses() {
     li.appendChild(frameBar);
     li.appendChild(text);
     HTMLCourses.appendChild(li);
+
+    // Adds the element to the course
+    course.element = li;
   }
 }
 
@@ -620,6 +494,8 @@ function createUpgrades() {
     div.appendChild(imageOverlay);
 
     HTMLUpgrades.appendChild(div);
+    upgrade.element = this;
+
     index++;
   }
 }
@@ -629,17 +505,24 @@ function createUpgrades() {
  * @param {*} attributeKey Attribute Name
  */
 function setActiveAttribute(attributeKey) {
-  for (const element of HTMLAttributes.children) {
-    let attribute = attributes[element.dataset.attribute];
-    if (element.dataset.attribute == attributeKey) {
-      element.dataset.active = true;
+  if (!attributes[attributeKey]) {
+    console.log(`No attribute with name "${attributeKey} exists!"`);
+    return;
+  }
+
+  activeAttributeName = attributeKey;
+  for (const key in attributes) {
+    const attribute = attributes[key];
+    const element = attribute.element;
+    if (attribute.name === attributeKey) {
       attribute.active = true;
-      activeAttributeName = attribute.name;
+      element.dataset.active = true;
     } else {
-      element.dataset.active = false;
       attribute.active = false;
+      element.dataset.active = false;
     }
   }
+
   SFX_selectAttribute.play();
 }
 
@@ -720,19 +603,26 @@ function updateAttributeText_detailed(element, attribute) {
  * @param {*} courseKey Course Name
  */
 function setActiveCourse(courseKey) {
-  for (const element of HTMLCourses.children) {
-    let course = courses[element.dataset.course];
-    if (element.dataset.course == courseKey) {
-      element.dataset.active = true;
+  if (!courses[courseKey]) {
+    console.log(`No course with name "${courseKey}" exists!`);
+    return;
+  }
+
+  activeCourseName = courseKey;
+  for (const key in courses) {
+    const course = courses[key];
+    const element = course.element;
+    if (course.name === courseKey) {
       course.active = true;
-      activeCourseName = course.name;
+      element.dataset.active = true;
     } else {
-      element.dataset.active = false;
       course.active = false;
+      element.dataset.active = false;
       // Removes the speed multiplier indicator;
       element.querySelector(".indicator").innerHTML = "";
     }
   }
+
   SFX_selectCourse.play();
 }
 
@@ -749,13 +639,20 @@ function setActiveCourse_byElement(courseElement) {
  * Updates all courses, both frontend and backend
  */
 function updateCourses() {
-  let isHoveringOverCourse = false;
+  // Resets the inline styles for required attributes
+  // TODO: may be better if just use HTML classes.
+  for (const element of HTMLAttributes.children) {
+    let text = element.querySelector(".text");
+    text.style.color = "";
+    text.style.padding = "";
+  }
+
   for (const element of HTMLCourses.children) {
     // Gets the element's corresponding course
     let courseKey = element.dataset.course;
     let course = courses[courseKey];
 
-    // Adds progress to the active course (that the player is taking)
+    // Adds progress to the active course
     if (element.dataset.active == "true") {
       course.addProgress();
       // Show the current course completion speed multiplier
@@ -771,42 +668,20 @@ function updateCourses() {
 
     updateCourseText(element.querySelector(".text"), course);
 
-    // If player is hovering over the course, highlight the attributes
+    // If player is hovering over the course, highlight the required attributes
     if (element.querySelector(".bar").matches(":hover")) {
-      isHoveringOverCourse = true;
-      // TODO: Nested loops have low-efficiency. Consider using a dictionary structure for the HTML elements or store them in the object.
-      for (const element of HTMLAttributes.children) {
-        let text = element.querySelector(".text");
-        let worked = false;
-        // Looks for the matching required attribute
-        for (let i = 0; i < course.reqAttributeNames.length; i++) {
-          const key = course.reqAttributeNames[i];
-          const attribute = attributes[key];
-          if (attribute.name === element.dataset.attribute) {
-            text.style.color = "rgb(15, 176, 162)";
-            text.style.padding = "2px";
-            text.innerHTML = `${attribute.name}: ${formatNumber(
-              attribute.computeValue()
-            )}<span style="color: rgb(255, 42, 53)">/${formatNumber(
-              course.reqAttributeValues[i]
-            )}</span><span style="color: rgb(15, 176, 152); font-size: 0.7em"> (at 1X)</span>`;
-            worked = true;
-            break;
-          }
-          if (!worked) {
-            text.style.color = "";
-            text.style.padding = "";
-          }
-        }
-      }
-    }
-
-    // Not hovering over any course, remove the inline styles.
-    if (!isHoveringOverCourse) {
-      for (const element of HTMLAttributes.children) {
-        let text = element.querySelector(".text");
-        text.style.color = "";
-        text.style.padding = "";
+      for (let i = 0; i < course.reqAttributeNames.length; i++) {
+        const key = course.reqAttributeNames[i];
+        const attribute = attributes[key];
+        const value = course.reqAttributeValues[i];
+        const text = attribute.element.querySelector(".text");
+        text.style.color = "rgb(15, 176, 162)";
+        text.style.padding = "2px";
+        text.innerHTML = `${attribute.name}: ${formatNumber(
+          attribute.computeValue()
+        )}<span style="color: rgb(255, 42, 53)">/${formatNumber(
+          value
+        )}</span><span style="color: rgb(15, 176, 152); font-size: 0.7em"> (at 1X)</span>`;
       }
     }
   }
@@ -858,11 +733,11 @@ function getAttribute(name) {
 }
 
 /**
- * Gets an update by key
+ * Gets an upgrade by key
  * @param {*} name string for the upgrade's key
  * @returns retrieved upgrade or null if not found
  */
-function getUpdate(name) {
+function getUpgrade(name) {
   return upgrades[name];
 }
 
@@ -887,7 +762,7 @@ function updateInfoBoard(string) {
  * @param {*} div the HTMLElement for an upgrade.
  */
 function updateInfoBoard_mouseEnterUpgrade(div) {
-  let upgrade = getUpdate(div.dataset.upgrade);
+  let upgrade = getUpgrade(div.dataset.upgrade);
   let canAfford = upgrade.canAfford();
   let purchasePrompt;
 
@@ -938,10 +813,6 @@ function clearInfoBoard() {
   infoBoard.scrollTop = 0;
 }
 
-function toFixed_trimZeroes(number, digits = 2) {
-  return number.toFixed(digits).replace(/\.0+$/, "");
-}
-
 /**
  * Adds to tiger spirits and generates a popup for visual representation
  * @param {} value number of tiger spirits
@@ -983,28 +854,6 @@ function computeAverageTigerSpiritPerSecond() {
   }
   total /= totalRunTime < 60 ? totalRunTime : 60;
   return total;
-}
-
-/**
- * Generates random (X, Y) coordinates where X can be within either (-maxX,-minX) or (minX,maxX); Same for Y.
- * @param {} minX
- * @param {*} maxX
- * @param {*} minY
- * @param {*} maxY
- * @returns X,Y coordinates as object literal
- */
-function randomCoordinate(minX, maxX, minY, maxY) {
-  // Computes X coordinate
-  const x = Math.random() * (maxX - minX) + minX;
-  const xSign = Math.random() < 0.5 ? -1 : 1;
-  const xCoordinate = xSign * x;
-
-  // Computes Y coordinate
-  const y = Math.random() * (maxY - minY) + minY;
-  const ySign = Math.random() < 0.5 ? -1 : 1;
-  const yCoordinate = ySign * y;
-
-  return { x: xCoordinate, y: yCoordinate };
 }
 
 /**
@@ -1067,25 +916,6 @@ function calculateOfflineIncome(offlineTime) {
 }
 
 /**
- * Gets a time string converted from given time interval
- * @param {*} time time in seconds
- * @returns time string displaying hours, minutes and seconds
- */
-function getTimeString(time, cap = 24 * 60 * 60) {
-  if (time > cap) {
-    time = cap;
-  }
-
-  let seconds = Number.parseInt(time);
-  let minutes = Number.parseInt(seconds / 60);
-  seconds %= 60;
-  let hours = Number.parseInt(minutes / 60);
-  minutes %= 60;
-
-  return `${hours}h ${minutes}min ${seconds}s`;
-}
-
-/**
  * Registers a button with a onclick callback function
  * This includes playing the SFX when clicked.
  * @param {*} button HTML Element of the button
@@ -1096,71 +926,6 @@ function registerButton(button, callback) {
     callback();
     SFX_clickButton.play();
   });
-}
-
-/**
- * If the player can reincarnate. Currently the requirement is to beat IGME-236 once.
- * @returns If the player can reincarnate
- */
-function canReincarnate() {
-  return courses[courseConfigs["IGME-202"].name].completions > 0;
-}
-
-/**
- * Performs reincarnation if possible
- * @param {*} force If true, forces a reincarnation (bypasses requirements)
- */
-function reincarnate(force = false) {
-  if (force || canReincarnate()) {
-    let newReincarnateBonus = computeReincarnateBonus();
-    if (force || newReincarnateBonus > reincarnateBonus) {
-      // Some statements may make more sense put here.
-      tigerSpiritIncomeTracker = [];
-
-      softReset();
-      SFX_reincarnate.play();
-      reincarnateBonus = newReincarnateBonus;
-    } else {
-      createPopUp(
-        combatPopupOverlay,
-        `Your new reincarnate bonus is too low! Not worth it.`,
-        3,
-        randomCoordinate(50, 150, 20, 60),
-        { x: 0, y: -1 },
-        10
-      ).markAsImportant();
-    }
-  } else {
-    SFX_cannotAffordUpgrade.play();
-    createPopUp(
-      combatPopupOverlay,
-      `You need to complete IGME-202 at least once to reincarnate!`,
-      3,
-      randomCoordinate(50, 150, 20, 60),
-      { x: 0, y: -1 },
-      10
-    ).markAsImportant();
-  }
-
-  // Soft reset clears localStorage, so SAVE the game!!
-  saveGame();
-}
-
-/**
- * Calculates the new reincarnate bonus if the player reincarnates.
- */
-function computeReincarnateBonus() {
-  let newReincarnateBonus = 1;
-  let index = 1;
-  for (const key in courses) {
-    const course = courses[key];
-    newReincarnateBonus += Math.pow(
-      course.completions / 100,
-      0.25 * Math.pow(1.25, index)
-    );
-    index++;
-  }
-  return newReincarnateBonus;
 }
 
 infoBoard.dataset.scrollPosition = 0;
@@ -1218,112 +983,4 @@ function scrollInfoBoard() {
 
   // Calls this function again on the next frame
   requestAnimationFrame(scrollInfoBoard);
-}
-
-/**
- * Formats the number with big units and keeps specified demical places
- * @param {number} num Number to be formatted
- * @param {number} digits How many decimal places to keep
- * @param {boolean} useScientificNotation Whether or not to use scientific notation instead of unit
- * @param {boolean} useAbbreviation Whether or not to use the short version of the unit
- */
-function formatNumber(
-  num,
-  digits = 1,
-  useScientificNotation = true,
-  useAbbreviation = true
-) {
-  // Note: In JavaScript, a const is a variable that is constant and cannot be reassigned.
-  // If we have a large const inside of a function, it will not be recreated every time the function is called.
-
-  // Define the names of the units.
-  // https://en.wikipedia.org/wiki/Names_of_large_numbers
-  const units = [
-    "",
-    "K",
-    "Million",
-    "Billion",
-    "Trillion",
-    "Quadrillion",
-    "Quintillion",
-    "Sextillion",
-    "Septillion",
-    "Octillion",
-    "Nonillion",
-    "Decillion",
-    "Undecillion",
-    "Duodecillion",
-    "Tredecillion",
-    "Quattuordecillion",
-    "Quindecillion",
-    "Sexdecillion",
-    "Septendecillion",
-    "Octodecillion",
-    "Novemdecillion",
-    "Vigintillion",
-    "Unvigintillion",
-  ];
-
-  // https://crusaders-of-the-lost-idols.fandom.com/wiki/Large_Number_Abbreviations
-  const units_abbr = [
-    "",
-    "K",
-    "M",
-    "B",
-    "t",
-    "q",
-    "Q",
-    "s",
-    "S",
-    "o",
-    "n",
-    "d",
-    "U",
-    "D",
-    "T",
-    "Qt",
-    "Qd",
-    "Sd",
-    "St",
-    "O",
-    "N",
-    "v",
-    "c",
-  ];
-
-  // Handle numbers less than 1000.
-  if (num < 1000) {
-    return toFixed_trimZeroes(num, digits);
-  }
-
-  // Handle Infinity
-  if (num === Infinity) {
-    return "Infinity";
-  }
-
-  function scientificNotation(num, digits) {
-    let exponent = Math.floor(Math.log10(num));
-    let shortNum = toFixed_trimZeroes(num / Math.pow(10, exponent), digits);
-    return `${shortNum}e${exponent}`;
-  }
-
-  if (useScientificNotation) {
-    return scientificNotation(num, digits);
-  }
-
-  // Determine the appropriate unit.
-  let unitIndex = Math.floor(Math.log10(num) / 3);
-  if (unitIndex < units.length) {
-    let unit = useAbbreviation ? units_abbr[unitIndex] : units[unitIndex];
-
-    // Divide the number by 1000 raised to the appropriate power and limit its decimal places.
-    let shortNum = toFixed_trimZeroes(num / Math.pow(1000, unitIndex), digits);
-
-    // Return the number with the appropriate unit suffix.
-    return `${shortNum}${unit.length == 1 ? "" : " "}${unit}`;
-  }
-  // If no valid unit can be used for this number (too large), uses scientific notation even if it's turned off.
-  else {
-    return scientificNotation(num, digits);
-  }
 }
