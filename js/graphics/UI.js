@@ -9,10 +9,12 @@ class UIManager {
 
   constructor() {
     // Prevents any manual constructor call bypassing the instance() getter.
-    if (!UIManager.instance) {
+    if (!UIManager._instance) {
       // Object properties
+
+      UIManager._instance = this;
     }
 
-    return UIManager.instance;
+    return UIManager._instance;
   }
 }

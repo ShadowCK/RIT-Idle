@@ -140,4 +140,13 @@ let SFX_reincarnate = new SFX(
   })
 );
 
+let SFX_error = new SFX(
+  new Howl({
+    src: ["sounds/GAME_MENU_SCORE_SFX000414.wav"],
+  }),
+  new Howl({
+    src: ["sounds/GAME_MENU_SCORE_SFX000416.wav"],
+  })
+);
+
 //#endregion

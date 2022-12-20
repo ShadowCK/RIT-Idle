@@ -50,6 +50,13 @@ class Course {
     this.courseTitle = "Unknown";
     this.description = "A course that you may take.";
     this.preReqs = [];
+    this.passedExams = 0;
+  }
+
+  // Grade string
+  get grade() {
+    let lastIndex = lastIndex(courseManager.grades);
+    return courseManager.grades(Math.min(this.passedExams, lastIndex));
   }
 
   static valueOf() {
@@ -142,17 +149,42 @@ class Course {
    * Change the strings in the preReq array to be real Course objects.
    */
   linkPreReqs() {
-    for (let i = 0; i < this.preReqs.length; i++) {
+    for (let i = lastIndex(this.preReqs); i >= 0; i--) {
       const item = this.preReqs[i];
       if (typeof item === "string") {
         if (courses[item]) {
           this.preReqs[i] = courses[item];
         } else {
-          console.log(`${item} is not a valid course name.`);
+          console.log(`Pre-req ${item} is not a valid course name.`);
           this.preReqs.splice(i, 1);
         }
       }
     }
+  }
+
+  /**
+   * @returns Whether the course has C- or a better grade.
+   */
+  isQualified() {
+    return this.passedExams >= courseManager.preReqExamReq;
+  }
+
+  /**
+   * @returns Whether the course has met its pre-req requirements.
+   */
+  hasMetPreReqs() {
+    // No pre-reqs, automatically pass.
+    if (this.preReqs.length === 0) {
+      return true;
+    }
+
+    for (const course of this.preReqs) {
+      if (!course.isQualified()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 
@@ -167,10 +199,32 @@ class CourseManager {
 
   constructor() {
     // Prevents any manual constructor call bypassing the instance() getter.
-    if (!CourseManager.instance) {
+    if (!CourseManager._instance) {
       // Object properties
-    }
+      this.grades = [
+        "D",
+        "D+",
+        "C-",
+        "C",
+        "C+",
+        "B-",
+        "B",
+        "B+",
+        "B",
+        "B+",
+        "A-",
+        "A",
+        "A+",
+      ];
+      // Each grade and their corresponding exam requires.
+      this.examReqs = this.grades.reduce((obj, element, index) => {
+        obj[element] = index;
+        return obj;
+      }, {});
+      this.preReqExamReq = this.examReqs["C-"];
 
-    return CourseManager.instance;
+      CourseManager._instance = this;
+    }
+    return CourseManager._instance;
   }
 }

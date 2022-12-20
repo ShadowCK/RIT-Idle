@@ -291,3 +291,28 @@ function randomCoordinate(minX, maxX, minY, maxY) {
 function lastIndex(array) {
   return array.length - 1;
 }
+
+/**
+ * Writes a variable to the element's dataset.
+ * @param {string} key Key for the variable
+ * @param {*} value Value of the variable
+ */
+HTMLElement.prototype.setData = function (key, value = "") {
+  this.dataset[key] = value;
+};
+
+/**
+ * Deletes a variable from the element's dataset (if it exists)
+ * @param {string} key Key for the variable
+ */
+HTMLElement.prototype.removeData = function (key) {
+  delete this.dataset[key];
+};
+
+/**
+ * @param {string} key
+ * @returns If the element's dataset contains a variable named as `key`
+ */
+HTMLElement.prototype.containsData = function (key) {
+  return this.dataset[key] || this.dataset[key] === "";
+};

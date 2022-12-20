@@ -18,6 +18,12 @@ const lastSaveTimestamp_key = "last save timestamp";
 let paused = false; // If paused, gameLoop (and most other tasks) will not be executed.
 
 // ********** Game-specific Stats **********
+// Managers;
+// const courseManager = CourseManager.instance;
+// const UI = UIManager.instance;
+const courseManager = new CourseManager();
+const UI = new UIManager();
+
 let totalGameTime; // Player's time spent across runs.
 const totalGameTime_key = "total game time";
 
@@ -61,6 +67,9 @@ let HTMLUpgrades = document.querySelector("#upgrades div");
 let HTMLCourses = document.querySelector("#courses ul");
 let infoBoard = document.querySelector("#infoBoard");
 let combatPopupOverlay = document.querySelector("#combat .popupOverlay");
+//TODO: this is temporary
+currentPopupOverlay = combatPopupOverlay;
+
 let pausedPrompt = document.querySelector("#paused");
 
 let resumeButton = document.querySelector("#paused .button");
@@ -312,12 +321,24 @@ function updateGame() {
 function processHeavyTasks() {
   if (paused) return;
 
+  // Refreshes upgrades' indicators for whether they are affordable.
   for (const element of HTMLUpgrades.children) {
     let upgrade = upgrades[element.dataset.upgrade];
     if (!upgrade.canAfford()) {
       element.dataset.cannotAfford = "";
     } else {
       delete element.dataset.cannotAfford;
+    }
+  }
+
+  // Refreshes courses' indicators for whether they are unlocked.
+  for (const courseKey in courses) {
+    const course = courses[courseKey];
+    const element = course.element;
+    if (course.hasMetPreReqs()) {
+      element.removeData("locked");
+    } else {
+      element.setData("locked");
     }
   }
 
@@ -399,10 +420,12 @@ function createCourses() {
         info += "Pre-Reqs: ";
         for (let i = 0; i < preReqsCount; i++) {
           const preReqCourse = course.preReqs[i];
-          info +=
-            i < lastIndex(course.preReqs)
-              ? `<span class="option-value">${preReqCourse.name}</span>, `
-              : `<span class="option-value">${preReqCourse.name}</span><br>`;
+          const qualified = preReqCourse.isQualified();
+          info += `<span style="color:${
+            qualified ? "rgb(0, 170, 0)" : "rgb(212,33,44)"
+          };">${preReqCourse.name}</span>${
+            i < lastIndex(course.preReqs) ? ", " : "<br>"
+          }`;
         }
       }
       // Attribute requirements
@@ -603,8 +626,18 @@ function updateAttributeText_detailed(element, attribute) {
  * @param {*} courseKey Course Name
  */
 function setActiveCourse(courseKey) {
-  if (!courses[courseKey]) {
+  const target = courses[courseKey];
+  // Invalid course key
+  if (!target) {
     console.log(`No course with name "${courseKey}" exists!`);
+    return;
+  }
+
+  // Pre-reqs not met.
+  if (!target.hasMetPreReqs()) {
+    sendError(
+      `You can't take this course right now. Must have C- or better in the pre-requisites.`
+    );
     return;
   }
 
@@ -923,7 +956,7 @@ function calculateOfflineIncome(offlineTime) {
  */
 function registerButton(button, callback) {
   button.addEventListener("click", (e) => {
-    callback();
+    callback(e);
     SFX_clickButton.play();
   });
 }

@@ -302,6 +302,18 @@ body {
   font-weight: bold;
 }
 
+.course[data-locked] .text {
+  color: rgb(22, 22, 26);
+}
+
+.course[data-locked] .bar {
+  background-color: hsl(0, 60%, 40%);
+}
+
+.course[data-locked] .bar:hover {
+  background-color: hsl(0, 60%, 80%);
+}
+
 .course[data-course="Capstone"] .text {
   animation: rainbow 5s linear infinite alternate;
 }
@@ -324,7 +336,7 @@ body {
   font-weight: bold;
 }
 
-.attribute.influential .text{
+.attribute.influential .text {
   color: rgb(11, 58, 0);
 }
 

@@ -69,7 +69,7 @@ This is an idle game where you play as a freshman in <abbr title="Rochester Inst
 
 - Pre-reqs
 
-  - Courses need to have pre-reqs to take, just like in real life.
+  - Courses need to have pre-reqs to take, just like in real life. Each pre-requisite requires a grade of C- or better. By passing exams, you improve your grades.
 
 - Digital Den
 

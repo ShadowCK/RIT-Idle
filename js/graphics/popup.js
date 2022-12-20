@@ -1,4 +1,5 @@
 const popups = [];
+let currentPopupOverlay;
 
 /**
  * a pop-up message with a HTML Element parent.
@@ -6,7 +7,7 @@ const popups = [];
 class PopUp {
   constructor(
     index,
-    parentElement,
+    parentElement = currentPopupOverlay,
     message = "Unknown",
     duration = 1,
     offset = { x: 0, y: 0 },
@@ -85,7 +86,7 @@ class PopUp {
 }
 
 function createPopUp(
-  parentElement,
+  parentElement = currentPopupOverlay,
   message,
   duration,
   offset,
@@ -105,4 +106,62 @@ function createPopUp(
   popups.push(popup);
 
   return popup;
+}
+
+let messageType = { normal: "normal", important: "important", error: "error" };
+
+// A bunch of wrapper functions of createPop
+function sendMessage(
+  type = messageType.normal,
+  message = "Unkown",
+  duration = 1,
+  offset = undefined,
+  direction = undefined,
+  speed = 10
+) {
+  switch (type) {
+    case messageType.normal:
+      createPopUp(
+        currentPopupOverlay,
+        message,
+        duration,
+        offset,
+        direction,
+        speed
+      );
+      break;
+    case messageType.important:
+      createPopUp(
+        currentPopupOverlay,
+        message,
+        duration,
+        offset,
+        direction,
+        speed
+      ).addTag("important");
+      break;
+    case messageType.error:
+      createPopUp(
+        currentPopupOverlay,
+        message,
+        duration,
+        offset,
+        direction,
+        speed
+      )
+        .addTag("important")
+        .addTag("error");
+      SFX_error.play();
+      break;
+  }
+}
+
+function sendError(
+  message = "Unkown",
+  duration = 1,
+  offset = undefined,
+  direction = undefined,
+  speed = 10
+) {
+  sendMessage(messageType.error, message, duration, offset, direction, speed);
 }

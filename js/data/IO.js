@@ -116,15 +116,9 @@ function loadGame_beforeHTML() {
     // If the course is newly created, the pre-reqs are strings. Change them to corresponding course objects.
     course.linkPreReqs();
     // If the course is loaded from save data, the pre-reqs are object literals. Change them to real course objects.
-    for (let parsedLiteral of course.preReqs) {
-      // Supposing the the real course's name is the same as its key (should be.)
-      parsedLiteral = courses[parsedLiteral.name];
-
-      // Precautious version
-      // const realCourse = courses[parsedLiteral.name];
-      // if (parsedLiteral == realCourse) {
-      //   parsedLiteral = courses;
-      // }
+    for (let i = 0; i < course.preReqs.length; i++) {
+      const parsedLiteral = course.preReqs[i];
+      course.preReqs[i] = courses[parsedLiteral.name];
     }
   }
 

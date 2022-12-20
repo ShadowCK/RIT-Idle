@@ -73,6 +73,22 @@ function onUserActivity() {
   }, tracker.maxProgress * 1000);
 }
 
+// Tracks if the user is holding a mouse button.
+let isMouseDown = false;
+document.addEventListener("mousedown", function () {
+  isMouseDown = true;
+});
+
+document.addEventListener("mouseup", function () {
+  isMouseDown = false;
+});
+
+// Holding the mouse counts as a user activity.
+setInterval((e) => {
+  if (isMouseDown) onUserActivity();
+}, 100);
 document.addEventListener("click", onUserActivity);
 document.addEventListener("mousemove", onUserActivity);
+document.addEventListener("keydown", onUserActivity);
+document.addEventListener("wheel", onUserActivity);
 document.addEventListener("keydown", onUserActivity);
