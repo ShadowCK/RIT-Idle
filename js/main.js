@@ -326,11 +326,11 @@ function processHeavyTasks() {
 
   // Refreshes upgrades' indicators for whether they are affordable.
   for (const element of HTMLUpgrades.children) {
-    let upgrade = upgrades[element.dataset.upgrade];
+    let upgrade = upgrades[element.getData("upgrade")];
     if (!upgrade.canAfford()) {
-      element.dataset.cannotAfford = "";
+      element.setData("cannotAfford");
     } else {
-      delete element.dataset.cannotAfford;
+      element.removeData("cannotAfford");
     }
   }
 
@@ -489,12 +489,12 @@ function createUpgrades() {
     const upgrade = upgrades[upgradeKey];
     let div = document.createElement("div");
     div.classList.add("upgrade");
-    div.dataset.upgrade = upgradeKey;
-    div.dataset.bought = upgrade.bought;
+    div.setData("upgrade", upgradeKey);
+    div.setData("bought", upgrade.bought);
 
     div.addEventListener("click", (e) => {
       if (upgrade.buy()) {
-        div.dataset.bought = true;
+        div.setData("bought", true);
         SFX_buyUpgrade.play();
         // Adds drop-shadow to the upgrade indicating its power!
         let ratio = upgrade.tier / upgrade.getMaxTier();
@@ -542,10 +542,10 @@ function setActiveAttribute(attributeKey) {
     const element = attribute.element;
     if (attribute.name === attributeKey) {
       attribute.active = true;
-      element.dataset.active = true;
+      element.setData("active", true);
     } else {
       attribute.active = false;
-      element.dataset.active = false;
+      element.setData("active", false);
     }
   }
 
@@ -557,7 +557,7 @@ function setActiveAttribute(attributeKey) {
  * @param {*} attributeElement HTML Element
  */
 function setActiveAttribute_byElement(attributeElement) {
-  let attributeKey = attributeElement.dataset.attribute;
+  let attributeKey = attributeElement.getData("attribute");
   setActiveAttribute(attributeKey);
 }
 
@@ -568,11 +568,11 @@ function updateAttributes() {
   // Loops through all HTML elements.
   for (const element of HTMLAttributes.children) {
     // Gets the attribute we are updating
-    let attributeKey = element.dataset.attribute;
+    let attributeKey = element.getData("attribute");
     let attribute = attributes[attributeKey];
 
     // Only adds progress to the active attribute
-    if (element.dataset.active == "true") {
+    if (element.containsData("active", "true")) {
       attribute.addProgress();
     }
 
@@ -650,10 +650,10 @@ function setActiveCourse(courseKey) {
     const element = course.element;
     if (course.name === courseKey) {
       course.active = true;
-      element.dataset.active = true;
+      element.setData("active", true);
     } else {
       course.active = false;
-      element.dataset.active = false;
+      element.setData("active", false);
       // Removes the speed multiplier indicator;
       element.querySelector(".indicator").innerHTML = "";
     }
@@ -667,7 +667,7 @@ function setActiveCourse(courseKey) {
  * @param {*} courseElement HTML element
  */
 function setActiveCourse_byElement(courseElement) {
-  let courseKey = courseElement.dataset.course;
+  let courseKey = courseElement.getData("course");
   setActiveCourse(courseKey);
 }
 
@@ -685,11 +685,11 @@ function updateCourses() {
 
   for (const element of HTMLCourses.children) {
     // Gets the element's corresponding course
-    let courseKey = element.dataset.course;
+    let courseKey = element.getData("course");
     let course = courses[courseKey];
 
     // Adds progress to the active course
-    if (element.dataset.active == "true") {
+    if (element.containsData("active", "true")) {
       course.addProgress();
       // Show the current course completion speed multiplier
       element.querySelector(".indicator").innerHTML = `${formatNumber(
@@ -798,7 +798,7 @@ function updateInfoBoard(string) {
  * @param {*} div the HTMLElement for an upgrade.
  */
 function updateInfoBoard_mouseEnterUpgrade(div) {
-  let upgrade = getUpgrade(div.dataset.upgrade);
+  let upgrade = getUpgrade(div.getData("upgrade"));
   let canAfford = upgrade.canAfford();
   let purchasePrompt;
 
@@ -845,7 +845,7 @@ function updateInfoBoard_mouseEnterUpgrade(div) {
  */
 function clearInfoBoard() {
   infoBoard.innerHTML = "";
-  infoBoard.dataset.scrollPosition = 0;
+  infoBoard.setData("scrollPosition", 0);
   infoBoard.scrollTop = 0;
 }
 
@@ -900,7 +900,7 @@ function pauseGame() {
   p.style.fontSize = "";
   p.innerHTML = "Paused...";
   paused = true;
-  pausedPrompt.dataset.paused = "";
+  pausedPrompt.setData("paused");
 }
 
 /**
@@ -908,7 +908,7 @@ function pauseGame() {
  */
 function resumeGame() {
   paused = false;
-  delete pausedPrompt.dataset.paused;
+  pausedPrompt.removeData("paused");
 }
 
 /**
@@ -964,7 +964,7 @@ function registerButton(button, callback) {
   });
 }
 
-infoBoard.dataset.scrollPosition = 0;
+infoBoard.setData("scrollPosition", 0);
 /**
  * Scrolls infoBoard when the player has stopped activity for a while.
  * In this case (for this element,) do NOT use smooth scrolling behavior in CSS! It disrupts the animation.
@@ -987,7 +987,7 @@ function scrollInfoBoard() {
   let scrollableHeight = infoBoard.scrollHeight - infoBoard.clientHeight;
 
   // ALL variables stored in a dataset are strings. Needs to convert them.
-  let scrollPosition = Number(infoBoard.dataset.scrollPosition);
+  let scrollPosition = Number(infoBoard.getData("scrollPosition"));
 
   const scrollSpeed = clamp(
     10 * mapValue(scrollableHeight, 0, 50, 0.5, 1),
@@ -1014,8 +1014,8 @@ function scrollInfoBoard() {
   infoBoard.scrollTop = scrollPosition;
 
   // Updates stored values
-  infoBoard.dataset.scrollPosition = scrollPosition;
-  infoBoard.dataset.scrollSpeed = scrollSpeed;
+  infoBoard.setData("scrollPosition", scrollPosition);
+  infoBoard.setData("scrollSpeed", scrollSpeed);
 
   // Calls this function again on the next frame
   requestAnimationFrame(scrollInfoBoard);

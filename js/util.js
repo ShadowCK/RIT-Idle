@@ -293,6 +293,15 @@ function lastIndex(array) {
 }
 
 /**
+ * Gets a variable from the element's dataset.
+ * @param {*} key Key for the variable
+ * @returns Value of the variable
+ */
+HTMLElement.prototype.getData = function (key) {
+  return this.dataset[key];
+};
+
+/**
  * Writes a variable to the element's dataset.
  * @param {string} key Key for the variable
  * @param {*} value Value of the variable
@@ -311,8 +320,11 @@ HTMLElement.prototype.removeData = function (key) {
 
 /**
  * @param {string} key
- * @returns If the element's dataset contains a variable named as `key`
+ * @param {*} value If left undefined, won't check for the value.
+ * @returns If the element's dataset contains a variable named as `key`, with specified value.
  */
-HTMLElement.prototype.containsData = function (key) {
-  return this.dataset[key] || this.dataset[key] === "";
+HTMLElement.prototype.containsData = function (key, value) {
+  const data = this.dataset[key];
+  if (!data && data != "") return false;
+  return value === undefined ? true : data === value.toString();
 };
