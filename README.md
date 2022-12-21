@@ -34,44 +34,44 @@ This is an idle game where you play as a freshman in <abbr title="Rochester Inst
 
 #### Planned Features
 
-- Tutoring
+- [ ] Tutoring
 
   - You will meet students and even professors who are willing to <abbr title="boosts your completion speed">teach you certain courses</abbr> and give you temporary attribute buffs, either training speed or value multiplier. This drains your tiger spirits. You may use reserach to increase your tutor limit (starts as 1.) As time goes, you get more familiar with your tutor(s) and such relationships benefit each other. Your tutor will become stronger but also asks for a higher pay.
 
-- Jobs
+- [ ] Jobs
 
   - Once you are qualified for a job, you can passively gain exp with it.
 
-- Exploration
+- [ ] Exploration
 
   - You will meet and compete against visitors, students, professors and even deans to gain exp and item drops. You will use a brand new set of stats these items provide to help with your exploration.
 
-- Research
+- [ ] Research
 
   - Unlocks new aspects in the game and gives you certain buffs.
 
-- Projects
+- [ ] Projects
 
   - This is like farming, you wait for 1/6/12... hours to gain rewards. You can have an active one (you are the lead developer, much faster) and many idle ones (you are the project manager.)
 
-- Community Tasks (Taskboard)
+- [ ] Community Tasks (Taskboard)
 
   - New tasks are coming up every hour. The taskboard can hold up to XX tasks, each with an expiration date. Tasks have different <abbr title="evaluated based on attribtues' average">tiers</abbr>. Lower-tier tasks are mostly a freebie, unless you are short in one of the attribtues. Higher-tier tasks are always a challenge that expects you to grow to finish them.
   - Tasks can be handed in immediately once you meet the requirements.
 
-- Skills
+- [ ] Skills
 
   - Special abilities that can benefit you in various ways.
 
-- Exams
+- [ ] Exams
 
   - Exams are like milestones. They become available at specific completion numbers, have a multiplied completion time and attribute requirement. Once you finish an exam, your income as well as the attribute requirements will increase. As a result, you may find yourself getting less average income at the beginning, but since you can always max out the completion speed, the expected value will eventually be higher.
 
-- Pre-reqs
+- [ ] Pre-reqs
 
   - Courses need to have pre-reqs to take, just like in real life. Each pre-requisite requires a grade of C- or better. By passing exams, you improve your grades.
 
-- Digital Den
+- [ ] Digital Den
 
   - Sells stationery, electrical appliances, digital equipment and all (even stats!). All they want is your exp.
 

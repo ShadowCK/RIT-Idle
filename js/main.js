@@ -21,8 +21,10 @@ let paused = false; // If paused, gameLoop (and most other tasks) will not be ex
 // Managers;
 // const courseManager = CourseManager.instance;
 // const UI = UIManager.instance;
+// const buffManager = BuffManager.instance;
 const courseManager = new CourseManager();
 const UI = new UIManager();
+const buffManager = new BuffManager();
 
 let totalGameTime; // Player's time spent across runs.
 const totalGameTime_key = "total game time";
@@ -308,6 +310,7 @@ function updateGame() {
   updateAttributes();
   updateCourses();
   updateInfo();
+  buffManager.update();
 
   // Updates popups
   for (const popup of popups) {
