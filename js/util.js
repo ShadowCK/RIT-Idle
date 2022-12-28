@@ -98,6 +98,21 @@ function toFixed_trimZeroes(number, digits = 2) {
   return number.toFixed(digits).replace(/\.0+$/, "");
 }
 
+function assign(objA, objB) {
+  for (const prop in objB) {
+    if (objB.hasOwnProperty(prop)) {
+      // Without the descriptor check, this function would be equivalent to Object.assign()
+      const descriptor = Object.getOwnPropertyDescriptor(objA, prop);
+      if (descriptor && !descriptor.writable) {
+        continue;
+      }
+      objA[prop] = objB[prop];
+    }
+  }
+}
+
+Object.defineProperty(Object.prototype, "assign_safe", { value: assign, enumerable: false });
+
 /**
  * Uses JSON to hard copy-paste properties of source obj into target obj.
  * @param {*} target Target object (accepts new properties)
@@ -106,7 +121,7 @@ function toFixed_trimZeroes(number, digits = 2) {
  */
 function extend(target, source) {
   if (target) {
-    Object.assign(target, hardCopy(source));
+    Object.assign_safe(target, hardCopy(source));
     return true;
   }
   return false;
@@ -132,6 +147,7 @@ function merge(a, b) {
  * @returns Hard copy of obj
  */
 function hardCopy(obj) {
+  if (obj === undefined) return undefined;
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -356,8 +372,8 @@ class CustomFilter {
   apply(string) {
     if (!this.replacer) return string;
 
-    let replacement = this.replacer();
-    if (!replacement) return string;
+    let replacement = this.replacer().toString();
+    if (!isValidString(replacement)) return string;
 
     return string.replace(this.token, replacement);
   }
@@ -376,7 +392,7 @@ class StaticFilter extends CustomFilter {
   }
 
   setReplacement(replacement) {
-    this.replacement = replacement;
+    this.replacement = replacement.toString();
     return this;
   }
 
@@ -389,8 +405,8 @@ class StaticFilter extends CustomFilter {
   apply(string) {
     if (!this.replacer) return string;
 
-    let replacement = this.hasReplacement() ? this.fetchReplacement() : this.replacer();
-    if (!replacement) return string;
+    let replacement = (this.hasReplacement() ? this.fetchReplacement() : this.replacer()).toString();
+    if (!isValidString(replacement)) return string;
 
     return string.replace(this.token, replacement);
   }
@@ -411,13 +427,8 @@ class DynamicFilter extends CustomFilter {
     return string.replace(regex, (match, key) => {
       if (!key) return match;
 
-      let replacement = this.replacer(key);
-      /**
-       * JavaScript feature. Returns the first truthy value.
-       * Equivalent to `return replacement ? replacement : match`. Better with more than two values.
-       * To get a boolean instead, use !!(a || b)
-       */
-      return replacement || match;
+      let replacement = this.replacer(key).toString();
+      return isValidString(replacement) ? replacement : match;
     });
   }
 }
@@ -437,7 +448,15 @@ class StringParser {
     for (const filter of filters) {
       formula = filter.apply(formula);
     }
-    return formula;
+    try {
+      return math.evaluate(formula);
+    } catch (e) {
+      console.log(`An error occurred while parsing formula ${formula} with filters:`);
+      console.log(filters);
+      console.log(`${e.name}: ${e.message}`);
+      console.trace();
+      return null;
+    }
   }
 }
 

@@ -403,11 +403,12 @@ function createCourses() {
 
     li.addEventListener("mouseenter", (e) => {
       let info = `<span style="color:rgb(15,15,155)">${course.courseTitle}</span><br><br>
+      Passed Exams: <span class="option-value">${formatNumber(course.passedExams)}</span><br>
       Reward: <span class="option-value">${formatNumber(
         course.tigerSpiritReward
-      )} Tiger Spirits</span><br>Standard Completion Time: <span class="option-value">${
+      )} Tiger Spirits</span><br>Standard Completion Time: <span class="option-value">${formatNumber(
         course.maxProgress
-      }s</span><br>Speed Cap: <span class="option-value">${formatNumber(course.speedMultiplierCap)}X</span><br>`;
+      )}s</span><br>Speed Cap: <span class="option-value">${formatNumber(course.speedMultiplierCap)}X</span><br>`;
       // Pre-Reqs
       let preReqsCount = course.preReqs.length;
       if (preReqsCount > 0) {
@@ -699,7 +700,9 @@ function updateCourses() {
  * @param {*} course course object
  */
 function updateCourseText(element, course) {
-  element.innerHTML = `${course.name}: ${formatNumber(course.completions)}`;
+  element.innerHTML = `${course.name}: ${formatNumber(course.completions)} LV.${formatNumber(course.passedExams)} (${
+    course.grade
+  })`;
 }
 
 /**

@@ -64,7 +64,7 @@ function loadObj(base, key, fallback, postProcess) {
   let parsed = JSON.parse(localStorage.getItem(key));
   if (parsed) {
     // No need to use a copy since it's parsed from save data.
-    Object.assign(base, parsed);
+    Object.assign_safe(base, parsed);
   } else {
     extend(base, fallback);
   }

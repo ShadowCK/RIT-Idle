@@ -40,7 +40,6 @@ class Course {
     this.maxProgress = maxProgress;
     this.completions = 0;
     this.maxProgressCap = maxProgressCap;
-    this.speedMultiplierCap = this.maxProgress / this.maxProgressCap;
     this.getProgressPercentage = getProgressPercentage;
 
     this.element = null;
@@ -56,10 +55,14 @@ class Course {
     this.isOnExam = false;
   }
 
+  get speedMultiplierCap() {
+    return this.maxProgress / this.maxProgressCap;
+  }
+
   // Grade string
   get grade() {
-    let lastIndex = lastIndex(courseManager.grades);
-    return courseManager.grades(Math.min(this.passedExams, lastIndex));
+    let index = lastIndex(courseManager.grades);
+    return courseManager.grades[Math.min(this.passedExams, index)];
   }
 
   // custom `==` operator
@@ -106,11 +109,17 @@ class Course {
     computedProgress *= combinedMultiplier;
     this.progress += computedProgress;
 
+    // Is completed at least once...
     if (this.progress >= this.maxProgress) {
+      if (this.isOnExam) {
+        this.completeExam();
+        SFX_completeExam.play();
+      } else {
+        SFX_completeCourse.play();
+      }
       let completions = Math.floor(this.progress / this.maxProgress);
       this.completions += completions;
       this.progress = this.progress % this.maxProgress;
-      SFX_completeCourse.play();
       addTigerSpirit(this.tigerSpiritReward * completions, countsInAverage);
     }
   }
@@ -197,7 +206,85 @@ class Course {
     return true;
   }
 
-  takeExam() {}
+  takeExam() {
+    if (this.isOnExam) {
+      sendMessage(messageType.error, "You are already taking an exam for this course!");
+      SFX_error.play();
+    } else if (PlayerData.examsTaking + 1 > PlayerData.maxExamsTaking) {
+      sendMessage(messageType.error, `You can't take more than ${PlayerData.maxExamsTaking} exams!`);
+      SFX_error.play();
+    } else {
+      // Course requirement
+      if (false) return;
+
+      this.progress = 0;
+
+      this.isOnExam = true;
+      PlayerData.examsTaking++;
+      PlayerData.isOnExam = true;
+      this.element.setData("isOnExam");
+
+      const filters = {
+        maxProgress: new CustomFilter("{max-progress}", () => this.config.maxProgress),
+        passed: new CustomFilter("{passed}", () => this.passedExams),
+      };
+
+      // Exam stats are greatly increased.
+      this.maxProgress = StringParser.parseFormula(
+        examSettings.formula_maxProgress,
+        filters.maxProgress,
+        filters.passed
+      );
+
+      for (let i = 0; i < this.reqAttributeValues.length; i++) {
+        this.reqAttributeValues[i] = StringParser.parseFormula(
+          examSettings.formula_reqAttributeValue,
+          new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
+          filters.passed
+        );
+      }
+    }
+  }
+
+  completeExam() {
+    this.passedExams++;
+    sendMessage(
+      messageType.normal,
+      `You passed your NO.${this.passedExams} exam on ${this.name}! Current grade:${this.grade}`
+    );
+
+    this.isOnExam = false;
+    if (--PlayerData.examsTaking === 0) {
+      PlayerData.isOnExam = false;
+    }
+    this.element.removeData("isOnExam");
+
+    // Changes course stats the match its level/grade/passed count.
+    const filters = {
+      maxProgress: new CustomFilter("{max-progress}", () => this.config.maxProgress),
+      TSReward: new CustomFilter("{TS-reward}", () => this.config.tigerSpiritReward),
+      passed: new CustomFilter("{passed}", () => this.passedExams),
+    };
+    this.maxProgress = StringParser.parseFormula(
+      courseSettings.formula_maxProgress,
+      filters.maxProgress,
+      filters.passed
+    );
+
+    for (let i = 0; i < this.reqAttributeValues.length; i++) {
+      this.reqAttributeValues[i] = StringParser.parseFormula(
+        courseSettings.formula_reqAttributeValue,
+        new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
+        filters.passed
+      );
+    }
+
+    this.tigerSpiritReward = StringParser.parseFormula(
+      courseSettings.formula_tigerSpiritReward,
+      filters.TSReward,
+      filters.passed
+    );
+  }
 }
 
 class CourseManager {

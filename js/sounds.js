@@ -29,10 +29,7 @@ class SFX {
     }
 
     // Cannot play a second time in less than "this.interval" seconds
-    if (
-      !this.lastPlayedTime ||
-      (Date.now() - this.lastPlayedTime) / 1000 >= this.interval
-    ) {
+    if (!this.lastPlayedTime || (Date.now() - this.lastPlayedTime) / 1000 >= this.interval) {
       this.lastPlayedTime = Date.now();
       let originalPitch = sound._rate;
       // Plays the sound at the given pitch
@@ -146,6 +143,15 @@ let SFX_error = new SFX(
   }),
   new Howl({
     src: ["sounds/GAME_MENU_SCORE_SFX000416.wav"],
+  })
+);
+
+let SFX_completeExam = new SFX(
+  new Howl({
+    src: ["sounds/Select_Item_05.wav"],
+  }),
+  new Howl({
+    src: ["sounds/Select_Item_06.wav"],
   })
 );
 
