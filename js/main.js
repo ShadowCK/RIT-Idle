@@ -115,18 +115,14 @@ registerButton(trainButton, (e) => {
   }
 });
 
-let reincarnateButton = document.querySelector(
-  "#gameTab-main .navbar .button.reincarnate"
-);
+let reincarnateButton = document.querySelector("#gameTab-main .navbar .button.reincarnate");
 registerButton(reincarnateButton, reincarnate);
 reincarnateButton.addEventListener("mouseenter", (e) => {
   let newBonus = computeReincarnateBonus();
   let hasMetRequirement = canReincarnate();
   let isHigherBonus = newBonus >= reincarnateBonus + 0.01;
   updateInfoBoard(
-    `Expected Bonus: <span class="option-value">${formatNumber(
-      computeReincarnateBonus()
-    )}X</span><br>
+    `Expected Bonus: <span class="option-value">${formatNumber(computeReincarnateBonus())}X</span><br>
     Requirement:<br>
     <span style="color:${
       hasMetRequirement ? "rgb(55, 155, 55)" : "rgb(212, 33, 44)"
@@ -248,8 +244,7 @@ function init() {
       // By adding a small portion outside of the window that will be clamped to the corners,
       // the water drops look more realistic (otherwise the corners look empty!)
       let xOffset =
-        Math.random() *
-          (container.offsetWidth - radius + container.offsetWidth * 0.05 * 2) -
+        Math.random() * (container.offsetWidth - radius + container.offsetWidth * 0.05 * 2) -
         container.offsetWidth * 0.05;
       xOffset = clamp(xOffset, 0, container.offsetWidth - radius);
       drop.style.left = xOffset + "px";
@@ -362,9 +357,9 @@ function createAttributes() {
     li.dataset["attribute"] = attributeKey;
 
     li.addEventListener("mouseenter", (e) => {
-      let info = `<span style="color:rgb(15,15,155)">${capitalizeFirstChar(
-        attributeKey
-      )}</span><br><br>${attribute.description}`;
+      let info = `<span style="color:rgb(15,15,155)">${capitalizeFirstChar(attributeKey)}</span><br><br>${
+        attribute.description
+      }`;
       updateInfoBoard(info);
     });
 
@@ -407,16 +402,12 @@ function createCourses() {
     li.dataset["course"] = courseKey;
 
     li.addEventListener("mouseenter", (e) => {
-      let info = `<span style="color:rgb(15,15,155)">${
-        course.courseTitle
-      }</span><br><br>
+      let info = `<span style="color:rgb(15,15,155)">${course.courseTitle}</span><br><br>
       Reward: <span class="option-value">${formatNumber(
         course.tigerSpiritReward
       )} Tiger Spirits</span><br>Standard Completion Time: <span class="option-value">${
         course.maxProgress
-      }s</span><br>Speed Cap: <span class="option-value">${formatNumber(
-        course.speedMultiplierCap
-      )}X</span><br>`;
+      }s</span><br>Speed Cap: <span class="option-value">${formatNumber(course.speedMultiplierCap)}X</span><br>`;
       // Pre-Reqs
       let preReqsCount = course.preReqs.length;
       if (preReqsCount > 0) {
@@ -424,9 +415,7 @@ function createCourses() {
         for (let i = 0; i < preReqsCount; i++) {
           const preReqCourse = course.preReqs[i];
           const qualified = preReqCourse.isQualified();
-          info += `<span style="color:${
-            qualified ? "rgb(0, 170, 0)" : "rgb(212,33,44)"
-          };">${preReqCourse.name}</span>${
+          info += `<span style="color:${qualified ? "rgb(0, 170, 0)" : "rgb(212,33,44)"};">${preReqCourse.name}</span>${
             i < lastIndex(course.preReqs) ? ", " : "<br>"
           }`;
         }
@@ -436,9 +425,7 @@ function createCourses() {
       for (let i = 0; i < length; ) {
         info += `Req. <span>${capitalizeFirstChar(
           course.reqAttributeNames[i]
-        )}</span>: <span class="option-value">${formatNumber(
-          course.reqAttributeValues[i]
-        )}</span>`;
+        )}</span>: <span class="option-value">${formatNumber(course.reqAttributeValues[i])}</span>`;
         i++;
         if (i < length) {
           info += `<br>`;
@@ -498,9 +485,7 @@ function createUpgrades() {
         SFX_buyUpgrade.play();
         // Adds drop-shadow to the upgrade indicating its power!
         let ratio = upgrade.tier / upgrade.getMaxTier();
-        div.style.filter = `drop-shadow(0 0 ${2 + ratio * 8}px hsl(${
-          (ratio * 25 * 360) % 315
-        },100%,50%))`;
+        div.style.filter = `drop-shadow(0 0 ${2 + ratio * 8}px hsl(${(ratio * 25 * 360) % 315},100%,50%))`;
         // Refreshes the info board.
         updateInfoBoard_mouseEnterUpgrade(div);
       }
@@ -509,9 +494,7 @@ function createUpgrades() {
         SFX_cannotAffordUpgrade.play();
       }
     });
-    div.addEventListener("mouseenter", (e) =>
-      updateInfoBoard_mouseEnterUpgrade(div)
-    );
+    div.addEventListener("mouseenter", (e) => updateInfoBoard_mouseEnterUpgrade(div));
     div.addEventListener("mouseleave", clearInfoBoard);
 
     let imageOverlay = document.createElement("img");
@@ -577,9 +560,7 @@ function updateAttributes() {
     }
 
     // Always updates HTML element for visuals (progress and base value may be added in other ways)
-    element.querySelector(
-      ".progress"
-    ).style.width = `${attribute.getProgressPercentage()}%`;
+    element.querySelector(".progress").style.width = `${attribute.getProgressPercentage()}%`;
 
     // When hovered over, shows details about the value
     if (element.querySelector(".bar").matches(":hover")) {
@@ -598,10 +579,7 @@ function updateAttributes() {
  * @param {*} attribute Attribute object
  */
 function updateAttributeText(element, attribute) {
-  element.innerHTML = `${attribute.name}: ${formatNumber(
-    attribute.computeValue(),
-    2
-  )}`;
+  element.innerHTML = `${attribute.name}: ${formatNumber(attribute.computeValue(), 2)}`;
 }
 
 /**
@@ -610,9 +588,7 @@ function updateAttributeText(element, attribute) {
  * @param {Attribute} attribute Attribute object
  */
 function updateAttributeText_detailed(element, attribute) {
-  element.innerHTML = `${attribute.name
-    .substring(0, 3)
-    .toUpperCase()}: (${formatNumber(
+  element.innerHTML = `${attribute.name.substring(0, 3).toUpperCase()}: (${formatNumber(
     attribute.baseValue,
     2
   )}+<span style="color:rgb(44,124,212)">${formatNumber(
@@ -638,9 +614,7 @@ function setActiveCourse(courseKey) {
 
   // Pre-reqs not met.
   if (!target.hasMetPreReqs()) {
-    sendError(
-      `You can't take this course right now. Must have C- or better in the pre-requisites.`
-    );
+    sendError(`You can't take this course right now. Must have C- or better in the pre-requisites.`);
     return;
   }
 
@@ -692,15 +666,11 @@ function updateCourses() {
     if (element.containsData("active", "true")) {
       course.addProgress();
       // Show the current course completion speed multiplier
-      element.querySelector(".indicator").innerHTML = `${formatNumber(
-        activeCourseSpeedMultiplier
-      )}X`;
+      element.querySelector(".indicator").innerHTML = `${formatNumber(activeCourseSpeedMultiplier)}X`;
     }
 
     // Always updates HTML element for visuals (progress and base value may be added in other ways)
-    element.querySelector(
-      ".progress"
-    ).style.width = `${course.getProgressPercentage()}%`;
+    element.querySelector(".progress").style.width = `${course.getProgressPercentage()}%`;
 
     updateCourseText(element.querySelector(".text"), course);
 
@@ -738,14 +708,9 @@ function updateCourseText(element, course) {
 function updateInfo() {
   document.querySelector(".tigerSpirits span").innerHTML = `${formatNumber(
     tigerSpirit
-  )}<span style="color:rgb(0,128,0)">+${formatNumber(
-    averageTigerSpiritPerSecond
-  )}/s</span>`;
-  document.querySelector(".totalGameTime span").innerHTML =
-    getTimeString(totalGameTime);
-  document.querySelector(
-    ".reincarnationBonus span"
-  ).innerHTML = `${formatNumber(reincarnateBonus)}X`;
+  )}<span style="color:rgb(0,128,0)">+${formatNumber(averageTigerSpiritPerSecond)}/s</span>`;
+  document.querySelector(".totalGameTime span").innerHTML = getTimeString(totalGameTime);
+  document.querySelector(".reincarnationBonus span").innerHTML = `${formatNumber(reincarnateBonus)}X`;
 }
 
 /**
@@ -808,32 +773,20 @@ function updateInfoBoard_mouseEnterUpgrade(div) {
       : `<div style="color:rgb(212,33,44);font-size:1.2em; margin-top:10px">Not enough TS.</div>`;
 
     updateInfoBoard(`
-  Upgrade: <span class="option-value">${upgrade.name} ${
-      upgrade.bought ? `+${upgrade.getNextTier()}` : ``
-    }</span><br>
+  Upgrade: <span class="option-value">${upgrade.name} ${upgrade.bought ? `+${upgrade.getNextTier()}` : ``}</span><br>
   Price: <span>${formatNumber(upgrade.price)} Tiger Spirits</span><br>
-  Bonus Attribute: <span class="option-value">${
-    upgrade.attributeName
-  }</span><br>
+  Bonus Attribute: <span class="option-value">${upgrade.attributeName}</span><br>
   Bonus Type: <span class="option-value">${upgrade.type}</span><br>
-  Bonus Value: <span class="option-value">${formatNumber(
-    upgrade.getNextTierValue()
-  )}</span>
+  Bonus Value: <span class="option-value">${formatNumber(upgrade.getNextTierValue())}</span>
   ${purchasePrompt}
   `);
   } else {
     purchasePrompt = `<div style="animation: rainbow 2s linear infinite alternate; font-size:2.4em; margin-top:10px">Maxed out</div>`;
     updateInfoBoard(`
-    Upgrade: <span class="option-value">${upgrade.name} +${
-      upgrade.tier
-    }</span><br>
-    Bonus Attribute: <span class="option-value">${
-      upgrade.attributeName
-    }</span><br>
+    Upgrade: <span class="option-value">${upgrade.name} +${upgrade.tier}</span><br>
+    Bonus Attribute: <span class="option-value">${upgrade.attributeName}</span><br>
     Bonus Type: <span class="option-value">${upgrade.type}</span><br>
-    Bonus Value: <span class="option-value">${formatNumber(
-      upgrade.getNextTierValue()
-    )}</span>
+    Bonus Value: <span class="option-value">${formatNumber(upgrade.getNextTierValue())}</span>
     ${purchasePrompt}
     `);
   }
@@ -925,10 +878,7 @@ function calculateOfflineIncome(offlineTime) {
   if (offlineTime < 1) return;
 
   const lowestIncomeRate = 10; // The player doesn't want to see a 0!
-  let incomeRate =
-    averageTigerSpiritPerSecond > lowestIncomeRate
-      ? averageTigerSpiritPerSecond
-      : lowestIncomeRate;
+  let incomeRate = averageTigerSpiritPerSecond > lowestIncomeRate ? averageTigerSpiritPerSecond : lowestIncomeRate;
   let income = offlineTime * incomeRate;
   // This amount won't count in average or it's causing big trouble! (Player can manipulate this... like pausing for an hour and having a huge TSPS)
   addTigerSpirit(income, false, 5, 10, true);
@@ -989,11 +939,7 @@ function scrollInfoBoard() {
   // ALL variables stored in a dataset are strings. Needs to convert them.
   let scrollPosition = Number(infoBoard.getData("scrollPosition"));
 
-  const scrollSpeed = clamp(
-    10 * mapValue(scrollableHeight, 0, 50, 0.5, 1),
-    10,
-    40
-  ); // pixels per second
+  const scrollSpeed = clamp(10 * mapValue(scrollableHeight, 0, 50, 0.5, 1), 10, 40); // pixels per second
 
   // HTML won't set scrollTop to exceed its maximum. We utilize that and allow scrollPosition to exceed it.
   // This sets a expected "stop time" when it hits the bottom, before resetting its position.
@@ -1001,10 +947,7 @@ function scrollInfoBoard() {
   let maxScrollTop = scrollableHeight + scrollSpeed * resetDelay;
 
   // Updates scrollPosition
-  scrollPosition = Math.min(
-    maxScrollTop,
-    scrollPosition + scrollSpeed * deltaTime
-  );
+  scrollPosition = Math.min(maxScrollTop, scrollPosition + scrollSpeed * deltaTime);
   // Restarts scrolling from the top
   if (scrollPosition >= maxScrollTop) {
     scrollPosition = 0;

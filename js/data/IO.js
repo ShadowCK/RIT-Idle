@@ -87,11 +87,7 @@ function loadGame_beforeHTML() {
   // We don't want tiger spirits to be kept across reincarnations.
   tigerSpirit = loadFloat(tigerSpirit_key, 0);
 
-  lastSaveTimestamp = loadInt_keep(
-    lastSaveTimestamp_key,
-    lastSaveTimestamp,
-    Date.now()
-  );
+  lastSaveTimestamp = loadInt_keep(lastSaveTimestamp_key, lastSaveTimestamp, Date.now());
 
   // TODO: We can actually store the history highest of a single run (every reincarnation,)
   // so even if the player is offline with no course running, they will get reasonable rewards.
@@ -109,7 +105,7 @@ function loadGame_beforeHTML() {
   }
   // Loads courses
   for (const key in courseConfigs) {
-    courses[key] = loadObj(new Course(), key, courseConfigs[key]);
+    courses[key] = loadObj(new Course(), key, courseConfigs[key]).addConfig();
   }
   for (const key in courses) {
     const course = courses[key];
@@ -161,11 +157,11 @@ function resetHTML() {
  */
 function loadGame_afterHTML() {
   activeCourseName = localStorage.getItem(activeCourseName_key);
-  if (activeCourseName) {
+  if (isValidString(activeCourseName)) {
     setActiveCourse(activeCourseName);
   }
   activeAttributeName = localStorage.getItem(activeAttributeName_key);
-  if (activeAttributeName) {
+  if (isValidString(activeAttributeName)) {
     setActiveAttribute(activeAttributeName);
   }
 
@@ -182,10 +178,7 @@ function saveGame() {
   localStorage.setItem(tigerSpirit_key, tigerSpirit);
   lastSaveTimestamp = Date.now();
   localStorage.setItem(lastSaveTimestamp_key, lastSaveTimestamp);
-  localStorage.setItem(
-    averageTigerSpiritPerSecond,
-    averageTigerSpiritPerSecond_key
-  );
+  localStorage.setItem(averageTigerSpiritPerSecond, averageTigerSpiritPerSecond_key);
   localStorage.setItem(reincarnations_key, reincarnations);
   localStorage.setItem(reincarnateBonus_key, reincarnateBonus);
 

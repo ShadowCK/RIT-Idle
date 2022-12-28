@@ -161,12 +161,7 @@ function getTimeString(time, cap = 24 * 60 * 60) {
  * @param {boolean} useScientificNotation Whether or not to use scientific notation instead of unit
  * @param {boolean} useAbbreviation Whether or not to use the short version of the unit
  */
-function formatNumber(
-  num,
-  digits = 1,
-  useScientificNotation = true,
-  useAbbreviation = true
-) {
+function formatNumber(num, digits = 1, useScientificNotation = true, useAbbreviation = true) {
   // Note: In JavaScript, a const is a variable that is constant and cannot be reassigned.
   // If we have a large const inside of a function, it will not be recreated every time the function is called.
 
@@ -293,6 +288,11 @@ function lastIndex(array) {
 }
 
 /**
+ * @returns The last index of an array
+ */
+Array.prototype.lastIndex = () => this.length - 1;
+
+/**
  * Gets a variable from the element's dataset.
  * @param {*} key Key for the variable
  * @returns Value of the variable
@@ -328,3 +328,119 @@ HTMLElement.prototype.containsData = function (key, value) {
   if (!data && data != "") return false;
   return value === undefined ? true : data === value.toString();
 };
+
+/**
+ * @param {string} variable NAME of the variable.
+ * @returns Whether the variable has been declared
+ */
+function isDeclared(variable) {
+  try {
+    eval(variable);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
+class CustomFilter {
+  /**
+   *
+   * @param {string} token
+   * @param {Function} replacer
+   */
+  constructor(token = "{}", replacer) {
+    this.token = token;
+    this.replacer = replacer;
+  }
+
+  apply(string) {
+    if (!this.replacer) return string;
+
+    let replacement = this.replacer();
+    if (!replacement) return string;
+
+    return string.replace(this.token, replacement);
+  }
+}
+
+class StaticFilter extends CustomFilter {
+  constructor(token = "{}", replacer) {
+    this.token = token;
+    this.replacer = replacer;
+    this.replacement = "";
+  }
+
+  hasReplacement() {
+    // Undefined, null, empty string are all falsy.
+    return !!this.replacement;
+  }
+
+  setReplacement(replacement) {
+    this.replacement = replacement;
+    return this;
+  }
+
+  fetchReplacement() {
+    let replacement = this.replacement;
+    this.replacement = "";
+    return replacement;
+  }
+
+  apply(string) {
+    if (!this.replacer) return string;
+
+    let replacement = this.hasReplacement() ? this.fetchReplacement() : this.replacer();
+    if (!replacement) return string;
+
+    return string.replace(this.token, replacement);
+  }
+}
+
+class DynamicFilter extends CustomFilter {
+  constructor(token = "attribute", replacer, separator = ":", leftWrapper = "{", rightWrapper = "}") {
+    super(token, replacer);
+    this.separator = separator;
+    this.leftWrapper = leftWrapper;
+    this.rightWrapper = rightWrapper;
+  }
+
+  apply(string) {
+    if (!this.replacer) return string;
+
+    const regex = new RegExp(`${this.leftWrapper}${this.token}${this.separator}(.*?)${this.rightWrapper}`, "g");
+    return string.replace(regex, (match, key) => {
+      if (!key) return match;
+
+      let replacement = this.replacer(key);
+      /**
+       * JavaScript feature. Returns the first truthy value.
+       * Equivalent to `return replacement ? replacement : match`. Better with more than two values.
+       * To get a boolean instead, use !!(a || b)
+       */
+      return replacement || match;
+    });
+  }
+}
+
+const RPGFilters = {
+  gameTime: new CustomFilter("{game-time}", () => getTimeString(totalGameTime)),
+  attribute: new DynamicFilter("attribute", (key) => formatNumber(attributes[key].computeValue())),
+};
+
+class StringParser {
+  /**
+   * @param {string} formula
+   * @param {CustomFilter[]} filters
+   * @returns Parsed result using formula and placeholder filters
+   */
+  static parseFormula(formula, ...filters) {
+    for (const filter of filters) {
+      formula = filter.apply(formula);
+    }
+    return formula;
+  }
+}
+
+function isValidString(string) {
+  return string && string !== "undefined" && string !== "null";
+}

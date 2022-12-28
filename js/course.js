@@ -45,12 +45,15 @@ class Course {
 
     this.element = null;
     this.active = false;
-
     // Details
     this.courseTitle = "Unknown";
     this.description = "A course that you may take.";
     this.preReqs = [];
+    this.isConfig = true;
+    this.config = null; // If this is a config already
+    // Exam system
     this.passedExams = 0;
+    this.isOnExam = false;
   }
 
   // Grade string
@@ -59,6 +62,7 @@ class Course {
     return courseManager.grades(Math.min(this.passedExams, lastIndex));
   }
 
+  // custom `==` operator
   static valueOf() {
     return this.name;
   }
@@ -145,6 +149,12 @@ class Course {
     return this.preReqs.length > 0;
   }
 
+  addConfig(config) {
+    if (config) this.config = config;
+    else this.config = courseConfigs[this.name];
+    return this;
+  }
+
   /**
    * Change the strings in the preReq array to be real Course objects.
    */
@@ -186,6 +196,8 @@ class Course {
 
     return true;
   }
+
+  takeExam() {}
 }
 
 class CourseManager {
@@ -201,21 +213,7 @@ class CourseManager {
     // Prevents any manual constructor call bypassing the instance() getter.
     if (!CourseManager._instance) {
       // Object properties
-      this.grades = [
-        "D",
-        "D+",
-        "C-",
-        "C",
-        "C+",
-        "B-",
-        "B",
-        "B+",
-        "B",
-        "B+",
-        "A-",
-        "A",
-        "A+",
-      ];
+      this.grades = ["D", "D+", "C-", "C", "C+", "B-", "B", "B+", "B", "B+", "A-", "A", "A+"];
       // Each grade and their corresponding exam requires.
       this.examReqs = this.grades.reduce((obj, element, index) => {
         obj[element] = index;
