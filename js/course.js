@@ -53,19 +53,27 @@ class Course {
     // Exam system
     this.passedExams = 0;
     this.isOnExam = false;
+
+    // Formula filters
+    this.filters = {
+      maxProgress: new CustomFilter("{max-progress}", () => this.config.maxProgress),
+      TSReward: new CustomFilter("{TS-reward}", () => this.config.tigerSpiritReward),
+      passed: new CustomFilter("{passed}", () => this.passedExams),
+    };
   }
 
+  /** How fast the player can ultimately be (e.g., `10X` for `1s/0.1s`) */
   get speedMultiplierCap() {
     return this.maxProgress / this.maxProgressCap;
   }
 
-  // Grade string
+  /** String to indicate the player's progress in this course. Capped at `A+` but the progress has no cap */
   get grade() {
     let index = lastIndex(courseManager.grades);
     return courseManager.grades[Math.min(this.passedExams, index)];
   }
 
-  // custom `==` operator
+  /** custom `==` operator */
   static valueOf() {
     return this.name;
   }
@@ -113,14 +121,13 @@ class Course {
     if (this.progress >= this.maxProgress) {
       if (this.isOnExam) {
         this.completeExam();
-        SFX_completeExam.play();
       } else {
         SFX_completeCourse.play();
+        let completions = Math.floor(this.progress / this.maxProgress);
+        this.completions += completions;
+        this.progress = this.progress % this.maxProgress;
+        addTigerSpirit(this.tigerSpiritReward * completions, countsInAverage);
       }
-      let completions = Math.floor(this.progress / this.maxProgress);
-      this.completions += completions;
-      this.progress = this.progress % this.maxProgress;
-      addTigerSpirit(this.tigerSpiritReward * completions, countsInAverage);
     }
   }
 
@@ -158,7 +165,13 @@ class Course {
     return this.preReqs.length > 0;
   }
 
+  /**
+   * Adds the config to the course
+   * @param {Course} config A copy of this course's initial state
+   * @returns this
+   */
   addConfig(config) {
+    this.isConfig = false;
     if (config) this.config = config;
     else this.config = courseConfigs[this.name];
     return this;
@@ -206,51 +219,68 @@ class Course {
     return true;
   }
 
+  /**
+   * @returns Whether the player can take the exam
+   */
+  canTakeExam() {}
+
+  /**
+   * Tries to take the exam if the requirements are met
+   */
   takeExam() {
+    // Already taking the exam
     if (this.isOnExam) {
-      sendMessage(messageType.error, "You are already taking an exam for this course!");
+      sendError("You are already taking an exam for this course!");
       SFX_error.play();
-    } else if (PlayerData.examsTaking + 1 > PlayerData.maxExamsTaking) {
-      sendMessage(messageType.error, `You can't take more than ${PlayerData.maxExamsTaking} exams!`);
+    }
+    // Cannot exceed the exam-taking limit
+    else if (PlayerData.examsTaking + 1 > PlayerData.maxExamsTaking) {
+      sendError(`You can't take more than ${PlayerData.maxExamsTaking} exams!`);
       SFX_error.play();
-    } else {
-      // Course requirement
-      if (false) return;
-
+    }
+    // If the player has met the exam requirement, take it!
+    // Normally this shouldn't happen because the `take exam` button should be disabled or invisible with no available exam.
+    else {
+      if (!canTakeExam()) {
+        sendMessage(messageType.important, `You haven't met the exam requirement yet!`);
+        return;
+      }
       this.progress = 0;
-
       this.isOnExam = true;
       PlayerData.examsTaking++;
       PlayerData.isOnExam = true;
+      // Adds identifier for CSS
       this.element.setData("isOnExam");
 
-      const filters = {
-        maxProgress: new CustomFilter("{max-progress}", () => this.config.maxProgress),
-        passed: new CustomFilter("{passed}", () => this.passedExams),
-      };
-
-      // Exam stats are greatly increased.
+      // When taking an exam, the stats required for completion are greatly increased.
       this.maxProgress = StringParser.parseFormula(
         examSettings.formula_maxProgress,
-        filters.maxProgress,
-        filters.passed
+        this.filters.maxProgress,
+        this.filters.passed
       );
-
       for (let i = 0; i < this.reqAttributeValues.length; i++) {
         this.reqAttributeValues[i] = StringParser.parseFormula(
           examSettings.formula_reqAttributeValue,
           new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
-          filters.passed
+          this.filters.passed
         );
       }
     }
   }
 
+  /**
+   * Called when the exam is completed. This levels up the course, resetting its stats with formulas to match the new level.
+   */
   completeExam() {
     this.passedExams++;
+    // Do not add exceeding exam progress to regular completions.
+    this.progress = 0;
+    SFX_completeExam.play();
+
     sendMessage(
-      messageType.normal,
-      `You passed your NO.${this.passedExams} exam on ${this.name}! Current grade:${this.grade}`
+      messageType.important,
+      `You passed your NO.${this.passedExams} exam on ${this.name}! Current grade: ${this.grade}`,
+      5
     );
 
     this.isOnExam = false;
@@ -259,30 +289,23 @@ class Course {
     }
     this.element.removeData("isOnExam");
 
-    // Changes course stats the match its level/grade/passed count.
-    const filters = {
-      maxProgress: new CustomFilter("{max-progress}", () => this.config.maxProgress),
-      TSReward: new CustomFilter("{TS-reward}", () => this.config.tigerSpiritReward),
-      passed: new CustomFilter("{passed}", () => this.passedExams),
-    };
+    // Changes stats
     this.maxProgress = StringParser.parseFormula(
       courseSettings.formula_maxProgress,
-      filters.maxProgress,
-      filters.passed
+      this.filters.maxProgress,
+      this.filters.passed
     );
-
     for (let i = 0; i < this.reqAttributeValues.length; i++) {
       this.reqAttributeValues[i] = StringParser.parseFormula(
         courseSettings.formula_reqAttributeValue,
         new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
-        filters.passed
+        this.filters.passed
       );
     }
-
     this.tigerSpiritReward = StringParser.parseFormula(
       courseSettings.formula_tigerSpiritReward,
-      filters.TSReward,
-      filters.passed
+      this.filters.TSReward,
+      this.filters.passed
     );
   }
 }

@@ -108,7 +108,7 @@ function createPopUp(
   return popup;
 }
 
-let messageType = { normal: "normal", important: "important", error: "error" };
+let messageType = { normal: "normal", important: "important", error: "error", warning: "warning" };
 
 // A bunch of wrapper functions of createPop
 function sendMessage(
@@ -158,7 +158,7 @@ function sendMessage(
 
 function sendError(
   message = "Unkown",
-  duration = 1,
+  duration = 3,
   offset = undefined,
   direction = undefined,
   speed = 10

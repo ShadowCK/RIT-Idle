@@ -98,6 +98,12 @@ function toFixed_trimZeroes(number, digits = 2) {
   return number.toFixed(digits).replace(/\.0+$/, "");
 }
 
+/**
+ * Safe version of Object.assign().
+ * If objA has a read-only property whose name is the same as objB's, it will NOT write to it.
+ * @param {*} objA
+ * @param {*} objB
+ */
 function assign(objA, objB) {
   for (const prop in objB) {
     if (objB.hasOwnProperty(prop)) {
@@ -358,17 +364,28 @@ function isDeclared(variable) {
   return true;
 }
 
+/**
+ * Filters all `token` (placeholders) in a string by the returned value of `replacer`
+ */
 class CustomFilter {
   /**
-   *
-   * @param {string} token
-   * @param {Function} replacer
+   * @param {string} token Identifier for the placeholder
+   * @param {Function} replacer Required to get a replacement for the placeholder.
    */
-  constructor(token = "{}", replacer) {
+  constructor(token = "{placeholder}", replacer) {
+    /** Identifier for the placeholder
+     * @type {string} */
     this.token = token;
+    /** Required to get a replacement for the placeholder.
+     * @type {Function} */
     this.replacer = replacer;
   }
 
+  /**
+   * Applies the filter to the input string to replace all matching placeholders
+   * @param {string} string
+   * @returns `string` with all placeholders parsed
+   */
   apply(string) {
     if (!this.replacer) return string;
 
@@ -379,23 +396,44 @@ class CustomFilter {
   }
 }
 
+/**
+ * In addition to {@link CustomFilter}, allows the user to manually set a {@link replacement}.
+ * When the filter is applied, it will prioritize the use of `replacement`.
+ * The {@link replacer} is only used in the absence of a `replacement`.
+ */
 class StaticFilter extends CustomFilter {
-  constructor(token = "{}", replacer) {
-    this.token = token;
-    this.replacer = replacer;
+  /**
+   * @param {string} token Identifier for the placeholder
+   * @param {Function} replacer Required to get a replacement for the placeholder.
+   */
+  constructor(token = "{placeholder}", replacer) {
+    super(token, replacer);
+    /** Every replacement is one-time use
+     * @type {string} */
     this.replacement = "";
   }
 
+  /**
+   * @returns Whether the `replacement` property is set.
+   */
   hasReplacement() {
     // Undefined, null, empty string are all falsy.
     return !!this.replacement;
   }
 
+  /**
+   * @param {string} replacement Replacement for the placeholder
+   * @returns this
+   */
   setReplacement(replacement) {
     this.replacement = replacement.toString();
     return this;
   }
 
+  /**
+   * Returns the replacement and removes it (`replacement` is one-time use)
+   * @returns `this.replacement`
+   */
   fetchReplacement() {
     let replacement = this.replacement;
     this.replacement = "";
@@ -412,7 +450,18 @@ class StaticFilter extends CustomFilter {
   }
 }
 
+/**
+ * Supports dynamic placeholders.
+ * e.g., when `token` = "attribute", it matches `{attribute:anyKey}` and inputs the key into the replacer.
+ */
 class DynamicFilter extends CustomFilter {
+  /**
+   * @param {string} token Identifier for the placeholder
+   * @param {Function} replacer Required to get a replacement for the placeholder. Supports a parameter for the key.
+   * @param {string} separator Separates the token and key.
+   * @param {string} leftWrapper Wrapping symbol to the left. Could be `""`.
+   * @param {string} rightWrapper Wrapping symbol to the right. Could be `""`.
+   */
   constructor(token = "attribute", replacer, separator = ":", leftWrapper = "{", rightWrapper = "}") {
     super(token, replacer);
     this.separator = separator;
@@ -433,16 +482,23 @@ class DynamicFilter extends CustomFilter {
   }
 }
 
+/**
+ * Preset filters for some common stats
+ * ? may be better put in configs.js
+ */
 const RPGFilters = {
   gameTime: new CustomFilter("{game-time}", () => getTimeString(totalGameTime)),
   attribute: new DynamicFilter("attribute", (key) => formatNumber(attributes[key].computeValue())),
 };
 
+/**
+ * Handles parsing certain strings.
+ */
 class StringParser {
   /**
-   * @param {string} formula
-   * @param {CustomFilter[]} filters
-   * @returns Parsed result using formula and placeholder filters
+   * @param {string} formula Math formula with placeholders
+   * @param {CustomFilter[]} filters Used to replace the replaceholders
+   * @returns Parsed numeric result
    */
   static parseFormula(formula, ...filters) {
     for (const filter of filters) {
@@ -460,6 +516,10 @@ class StringParser {
   }
 }
 
+/**
+ * @param {string} string
+ * @returns whether the input string is valid (false if `string` is falsy, "undefined" or "null")
+ */
 function isValidString(string) {
   return string && string !== "undefined" && string !== "null";
 }
