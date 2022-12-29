@@ -13,8 +13,7 @@
   cursor: pointer;
   width: 100%;
 
-  filter: drop-shadow(0 0 1px rgb(237, 110, 7))
-    drop-shadow(2px 2px 3px rgb(65, 65, 65));
+  filter: drop-shadow(0 0 1px rgb(237, 110, 7)) drop-shadow(2px 2px 3px rgb(65, 65, 65));
 }
 
 .button:hover {
@@ -115,8 +114,7 @@ body {
 #footer p {
   color: rgb(218, 218, 218);
   text-shadow: 0 0 3px #fef3f3;
-  filter: drop-shadow(0 0 4px rgba(255, 252, 249, 0.6))
-    drop-shadow(0 0 6px rgb(58, 24, 3))
+  filter: drop-shadow(0 0 4px rgba(255, 252, 249, 0.6)) drop-shadow(0 0 6px rgb(58, 24, 3))
     drop-shadow(0 0 10px rgba(255, 154, 71, 0.6));
 }
 
@@ -133,10 +131,8 @@ body {
 #gameWindow:hover {
   background-color: rgb(229, 229, 229);
 
-  filter: drop-shadow(0 0 4px rgb(39, 39, 39))
-    drop-shadow(0 0 8px rgba(99, 99, 99, 0.4))
-    drop-shadow(0 0 20px rgba(255, 252, 249, 0.3))
-    drop-shadow(0 0 40px rgba(255, 150, 65, 0.2));
+  filter: drop-shadow(0 0 4px rgb(39, 39, 39)) drop-shadow(0 0 8px rgba(99, 99, 99, 0.4))
+    drop-shadow(0 0 20px rgba(255, 252, 249, 0.3)) drop-shadow(0 0 40px rgba(255, 150, 65, 0.2));
 }
 
 #gameWindow:has(:hover:not(.gameTab)) {
@@ -283,17 +279,61 @@ body {
   filter: drop-shadow(4px 4px 2px rgb(155, 155, 155));
 }
 
-.course[data-active="true"] .bar,
-.attribute[data-active="true"] .bar {
-  background-color: orange;
-}
-
 .progress {
   height: 100%;
   transition-duration: 0s;
   grid-area: bar;
   background-color: green;
   filter: drop-shadow(0 0 2px rgba(9, 64, 2, 0.6));
+}
+
+.course[data-active="true"] .bar,
+.attribute[data-active="true"] .bar {
+  background-color: orange;
+}
+
+@keyframes canTakeExam {
+  0% {
+    background-color: hsl(52, 100%, 73%);
+  }
+
+  60% {
+    background-color: rgba(255, 237, 117, 0.7);
+  }
+
+  100% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+.course[data-can-take-exam] {
+  border-radius: 8px;
+  animation: canTakeExam 1s linear infinite alternate;
+}
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+.course[data-is-on-exam] .progress {
+  background-color: #5cb85c;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 40px 40px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px -1px 2px 2px inset;
+  animation: progress-bar-stripes 2s linear infinite;
 }
 
 .course .text {

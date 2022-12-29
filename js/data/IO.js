@@ -55,18 +55,21 @@ function loadInt_keep(key, variable, fallback) {
  * @param {*} base Typically a new instance of a type
  * @param {string} key Key of the localStorage item
  * @param {*} fallback Source object from which to copy paste properties. Will use a hard copy, so no modifying source.
- * @param {function} postProcess follow-up function to process loaded properties.
+ * TODO: Using a hard copy is not always right (for shared data!)
+ * ! And current hardCopy() is not a real hard copy, but an object literal without all the methods!
+ * @param {function} postProcess Follow-up function to process loaded properties.
+ * @param {string[]} ignores Ignored properties won't be assigned to `base`.
  * @returns Base object with properties loaded from either save data or fallback object
  */
-function loadObj(base, key, fallback, postProcess) {
+function loadObj(base, key, fallback, postProcess, ...ignores) {
   if (!base) return undefined;
 
   let parsed = JSON.parse(localStorage.getItem(key));
   if (parsed) {
     // No need to use a copy since it's parsed from save data.
-    Object.assign_safe(base, parsed);
+    Object.assign_safe(base, parsed, ignores);
   } else {
-    extend(base, fallback);
+    extend(base, fallback, ignores);
   }
 
   if (postProcess) postProcess();
@@ -97,31 +100,45 @@ function loadGame_beforeHTML() {
 
   reincarnateBonus = loadFloat_keep(reincarnateBonus_key, reincarnateBonus, 1);
 
+  // Loads upgrades
+  for (const _key in upgradeConfigs) {
+    const key = upgradeConfigs[_key].name;
+    upgrades[key] = loadObj(new Upgrade(), key, upgradeConfigs[_key]);
+  }
+
   // Loads attributes
   for (const _key in attributeKeys) {
     // "_key" is dictionary (object literal) key. "key" is attribute key/name. They may be the same but this step is essential.
     const key = attributeKeys[_key];
     attributes[key] = loadObj(new Attribute(), key, attributeConfigs[key]);
   }
+  // If the attribute is loaded from save data, the upgrades are object literals.
+  // TODO: With the newly added `ignores` parameter, do not load the upgrades (since they will be replaced)
+  // * Just push the loaded upgrades to attribute.upgrades to save computations.
+  for (const key in attributes) {
+    /** @type {Attribute} */
+    const attribute = attributes[key];
+    for (let i = 0; i < attribute.upgrades.length; i++) {
+      const parsedLiteral = attribute.upgrades[i];
+      attribute.upgrades[i] = upgrades[parsedLiteral.name];
+    }
+  }
+
   // Loads courses
   for (const key in courseConfigs) {
-    courses[key] = loadObj(new Course(), key, courseConfigs[key]).addConfig();
+    courses[key] = loadObj(new Course(), key, courseConfigs[key], null, "filters").addConfig();
   }
   for (const key in courses) {
+    /** @type {Course} */
     const course = courses[key];
     // If the course is newly created, the pre-reqs are strings. Change them to corresponding course objects.
     course.linkPreReqs();
+    // TODO: same as above `TODO`.
     // If the course is loaded from save data, the pre-reqs are object literals. Change them to real course objects.
     for (let i = 0; i < course.preReqs.length; i++) {
       const parsedLiteral = course.preReqs[i];
       course.preReqs[i] = courses[parsedLiteral.name];
     }
-  }
-
-  // Loads upgrades
-  for (const _key in upgradeConfigs) {
-    const key = upgradeConfigs[_key].name;
-    upgrades[key] = loadObj(new Upgrade(), key, upgradeConfigs[_key]);
   }
 }
 

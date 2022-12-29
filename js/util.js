@@ -103,9 +103,14 @@ function toFixed_trimZeroes(number, digits = 2) {
  * If objA has a read-only property whose name is the same as objB's, it will NOT write to it.
  * @param {*} objA
  * @param {*} objB
+ * @param {string[]} ignores Ignored properties won't be assigned to `objA`.
  */
-function assign(objA, objB) {
+function assign(objA, objB, ignores = []) {
   for (const prop in objB) {
+    if (ignores && ignores.includes(prop)) {
+      continue;
+    }
+
     if (objB.hasOwnProperty(prop)) {
       // Without the descriptor check, this function would be equivalent to Object.assign()
       const descriptor = Object.getOwnPropertyDescriptor(objA, prop);
@@ -123,11 +128,12 @@ Object.defineProperty(Object.prototype, "assign_safe", { value: assign, enumerab
  * Uses JSON to hard copy-paste properties of source obj into target obj.
  * @param {*} target Target object (accepts new properties)
  * @param {*} source Source object (provides properties)
+ * @param {string[]} ignores Ignored properties won't be assigned to `target`.
  * @returns If the extension is successful.
  */
-function extend(target, source) {
+function extend(target, source, ignores) {
   if (target) {
-    Object.assign_safe(target, hardCopy(source));
+    Object.assign_safe(target, hardCopy(source), ignores);
     return true;
   }
   return false;
@@ -392,7 +398,7 @@ class CustomFilter {
     let replacement = this.replacer().toString();
     if (!isValidString(replacement)) return string;
 
-    return string.replace(this.token, replacement);
+    return string.replaceAll(this.token, replacement);
   }
 }
 
@@ -446,7 +452,7 @@ class StaticFilter extends CustomFilter {
     let replacement = (this.hasReplacement() ? this.fetchReplacement() : this.replacer()).toString();
     if (!isValidString(replacement)) return string;
 
-    return string.replace(this.token, replacement);
+    return string.replaceAll(this.token, replacement);
   }
 }
 
@@ -473,7 +479,7 @@ class DynamicFilter extends CustomFilter {
     if (!this.replacer) return string;
 
     const regex = new RegExp(`${this.leftWrapper}${this.token}${this.separator}(.*?)${this.rightWrapper}`, "g");
-    return string.replace(regex, (match, key) => {
+    return string.replaceAll(regex, (match, key) => {
       if (!key) return match;
 
       let replacement = this.replacer(key).toString();

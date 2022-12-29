@@ -116,7 +116,7 @@ registerButton(trainButton, (e) => {
 });
 
 let reincarnateButton = document.querySelector("#gameTab-main .navbar .button.reincarnate");
-registerButton(reincarnateButton, reincarnate);
+registerButton(reincarnateButton, (e) => reincarnate(false));
 reincarnateButton.addEventListener("mouseenter", (e) => {
   let newBonus = computeReincarnateBonus();
   let hasMetRequirement = canReincarnate();
@@ -165,8 +165,8 @@ function hardReset() {
 }
 
 /**
- * @WARNING not fully tested.
  * Clears LocalStorage without reloading the page, keeping existing data. Basically the same as hardReset (yet.)
+ * @Warning not fully tested
  */
 function softReset() {
   if (document.readyState === "complete") {
@@ -268,7 +268,7 @@ function init() {
 
 /**
  * Continuously updates game data and graphics!
- * @param {*} realtimeSinceStartup time since the page is loaded
+ * @param {number} realtimeSinceStartup time since the page is loaded
  */
 function gameLoop(realtimeSinceStartup) {
   if (!paused) {
@@ -329,14 +329,22 @@ function processHeavyTasks() {
     }
   }
 
-  // Refreshes courses' indicators for whether they are unlocked.
   for (const courseKey in courses) {
+    /** @type {Course} */
     const course = courses[courseKey];
     const element = course.element;
+    // Refreshes courses' indicators for whether they are unlocked.
     if (course.hasMetPreReqs()) {
       element.removeData("locked");
     } else {
       element.setData("locked");
+    }
+    // Refreshes courses' indicators for whether there is an exam available.
+    // ? This seems to make more sense if put in `if (course.hasMetPreReqs())`
+    if (course.canTakeExam() && !course.isOnExam) {
+      element.setData("canTakeExam");
+    } else {
+      element.removeData("canTakeExam");
     }
   }
 
@@ -661,6 +669,7 @@ function updateCourses() {
   for (const element of HTMLCourses.children) {
     // Gets the element's corresponding course
     let courseKey = element.getData("course");
+    /** @type {Course} */
     let course = courses[courseKey];
 
     // Adds progress to the active course
@@ -675,8 +684,11 @@ function updateCourses() {
 
     updateCourseText(element.querySelector(".text"), course);
 
-    // If player is hovering over the course, highlight the required attributes
+    // If player is hovering over the course, highlight the required attributes and display completions until next exam.
     if (element.querySelector(".bar").matches(":hover")) {
+      // ! course.completionsTilExam evaluates a formula, which is expensive.
+      // TODO: Update the text every second instead of every frame.
+      element.querySelector(".text").innerHTML = `Exam: ${formatNumber(course.completionsTilExam)} completions`;
       for (let i = 0; i < course.reqAttributeNames.length; i++) {
         const key = course.reqAttributeNames[i];
         const attribute = attributes[key];

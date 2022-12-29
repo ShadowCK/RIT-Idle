@@ -49,6 +49,7 @@ class Course {
     this.description = "A course that you may take.";
     this.preReqs = [];
     this.isConfig = true;
+    /** @type {Course} */
     this.config = null; // If this is a config already
     // Exam system
     this.passedExams = 0;
@@ -59,6 +60,7 @@ class Course {
       maxProgress: new CustomFilter("{max-progress}", () => this.config.maxProgress),
       TSReward: new CustomFilter("{TS-reward}", () => this.config.tigerSpiritReward),
       passed: new CustomFilter("{passed}", () => this.passedExams),
+      nextLevel: new CustomFilter("{next-level}", () => this.passedExams + 1),
     };
   }
 
@@ -222,12 +224,23 @@ class Course {
   /**
    * @returns Whether the player can take the exam
    */
-  canTakeExam() {}
+  canTakeExam() {
+    return this.completions >= this.reqCompletions;
+  }
+
+  get reqCompletions() {
+    return StringParser.parseFormula(examSettings.formula_reqCompletions, this.filters.passed);
+  }
+
+  get completionsTilExam() {
+    return Math.max(0, Math.ceil(this.reqCompletions - this.completions));
+  }
 
   /**
    * Tries to take the exam if the requirements are met
+   * @param {boolean} force Whether to ignore the exam requirement. For debug purposes.
    */
-  takeExam() {
+  takeExam(force) {
     // Already taking the exam
     if (this.isOnExam) {
       sendError("You are already taking an exam for this course!");
@@ -241,10 +254,11 @@ class Course {
     // If the player has met the exam requirement, take it!
     // Normally this shouldn't happen because the `take exam` button should be disabled or invisible with no available exam.
     else {
-      if (!canTakeExam()) {
-        sendMessage(messageType.important, `You haven't met the exam requirement yet!`);
+      if (!this.canTakeExam() && !force) {
+        sendMessage(messageType.important, `You haven't met the completion requirement yet!`);
         return;
       }
+      setActiveCourse(this.name);
       this.progress = 0;
       this.isOnExam = true;
       PlayerData.examsTaking++;
@@ -256,13 +270,13 @@ class Course {
       this.maxProgress = StringParser.parseFormula(
         examSettings.formula_maxProgress,
         this.filters.maxProgress,
-        this.filters.passed
+        this.filters.nextLevel
       );
       for (let i = 0; i < this.reqAttributeValues.length; i++) {
         this.reqAttributeValues[i] = StringParser.parseFormula(
           examSettings.formula_reqAttributeValue,
           new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
-          this.filters.passed
+          this.filters.nextLevel
         );
       }
     }

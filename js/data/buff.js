@@ -95,7 +95,6 @@ class BuffManager {
   computeValue(baseValue, category) {
     if (!this.buffs[category]) return;
 
-    debugger;
     let computedValue = baseValue;
     const categoryMap = this.buffs[category];
     for (const id in categoryMap) {
