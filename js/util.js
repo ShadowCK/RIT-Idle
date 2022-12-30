@@ -318,7 +318,7 @@ function lastIndex(array) {
 /**
  * @returns The last index of an array
  */
-Array.prototype.lastIndex = () => this.length - 1;
+Object.defineProperty(Array.prototype, "lastIndex", { value: () => this.length - 1, enumerable: false });
 
 /**
  * Gets a variable from the element's dataset.
@@ -528,4 +528,89 @@ class StringParser {
  */
 function isValidString(string) {
   return string && string !== "undefined" && string !== "null";
+}
+
+/**
+ * Chaining version of HTMLElement.prototype.append(nodes).
+ * append() returns nothing, making it unable to be chained
+ * @param  {...Node} nodes
+ * @returns {HTMLElement} this
+ */
+HTMLElement.prototype.append_chain = function (...nodes) {
+  // The rest parameter `nodes` is now an array of input parameters [node1,node2,node3...].
+  // The spread operator separates them as individuals again.
+  this.append(...nodes);
+  // Is equivalent to the below statement
+  // this.append.apply(this, nodes);
+  return this;
+};
+
+// EventTarget is a DOM interface implemented by objects that can receive events and may have listeners for them.
+EventTarget.prototype._addEventListener = EventTarget.prototype.addEventListener;
+
+/**
+ * Modification (overwriting) to the original `addEventListener`.
+ * Reference: https://www.sqlpac.com/en/documents/javascript-listing-active-event-listeners.html
+ * @param {string} type
+ * @param {boolean} listener
+ * @param {AddEventListenerOptions | boolean} options
+ */
+EventTarget.prototype.addEventListener = function (type, listener, options) {
+  if (options == undefined) options = false;
+  this._addEventListener(type, listener, options);
+  // Creates map for the event listener lists
+  if (!this.eventListenerList) this.eventListenerList = {};
+  // Creates array as the event listener list
+  if (!this.eventListenerList[type]) this.eventListenerList[type] = [];
+  // Stores the event listener
+  this.eventListenerList[type].push({ listener: listener, options: options });
+};
+
+/**
+ * Gets the array for the event listeners of target type
+ * @param {string} type Type of the event listeners
+ * @returns {Function[]} Array of event listeners
+ * * Do not write to the returned object
+ */
+EventTarget.prototype.getEventListeners = function (type) {
+  // ? Maybe returning null is better, because it's not heavily used.
+  if (!this.eventListenerList) return [];
+  if (!type) {
+    // Returns the entire map
+    return this.eventListenerList;
+  }
+  // ? Maybe returning null is better, because it's not heavily used.
+  if (!this.eventListenerList[type]) {
+    return [];
+  }
+  return this.eventListenerList[type];
+};
+
+/**
+ * @param {string} type Type of the event listeners
+ * @returns {boolean} Whether the {@link EventTarget} has been registered a listener of `type`
+ */
+EventTarget.prototype.hasEventListener = function (type) {
+  if (!this.eventListenerList) return false;
+  if (!this.eventListenerList[type]) false;
+  return this.eventListenerList[type].length > 0;
+};
+
+/**
+ * Displays all event listeners registered for an element.
+ * @param {HTMLElement} element
+ */
+function showEvents(element) {
+  console.log("Registered event listeners for element:");
+  console.log(element);
+  _showEvents(element.getEventListeners());
+}
+
+function _showEvents(events) {
+  for (let event of Object.keys(events)) {
+    console.log(event + " ----------------> " + events[event].length);
+    for (let i = 0; i < events[event].length; i++) {
+      console.log(events[event][i].listener.toString());
+    }
+  }
 }

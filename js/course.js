@@ -1,6 +1,6 @@
 /**
  * Gets the active course
- * @returns object of the active course (being taken)
+ * @returns {Course} object of the active course (being taken)
  */
 function getActiveCourse() {
   return courses[activeCourseName];
@@ -253,12 +253,15 @@ class Course {
     }
     // If the player has met the exam requirement, take it!
     // Normally this shouldn't happen because the `take exam` button should be disabled or invisible with no available exam.
+    // But we don't want to check and update the buttons every frame. Let's say every second - then there's a time gap for
+    // the player to click on the button! (if it was usable)
     else {
       if (!this.canTakeExam() && !force) {
-        sendMessage(messageType.important, `You haven't met the completion requirement yet!`);
+        sendMessage(messageType.important, `You haven't met the completion requirement yet to take an exam!`);
         return;
       }
-      setActiveCourse(this.name);
+      this.element.removeData("canTakeExam");
+      setActiveCourse(this.name, false);
       this.progress = 0;
       this.isOnExam = true;
       PlayerData.examsTaking++;
@@ -266,19 +269,7 @@ class Course {
       // Adds identifier for CSS
       this.element.setData("isOnExam");
 
-      // When taking an exam, the stats required for completion are greatly increased.
-      this.maxProgress = StringParser.parseFormula(
-        examSettings.formula_maxProgress,
-        this.filters.maxProgress,
-        this.filters.nextLevel
-      );
-      for (let i = 0; i < this.reqAttributeValues.length; i++) {
-        this.reqAttributeValues[i] = StringParser.parseFormula(
-          examSettings.formula_reqAttributeValue,
-          new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
-          this.filters.nextLevel
-        );
-      }
+      this.updateStats(true);
     }
   }
 
@@ -297,30 +288,62 @@ class Course {
       5
     );
 
-    this.isOnExam = false;
-    if (--PlayerData.examsTaking === 0) {
-      PlayerData.isOnExam = false;
-    }
-    this.element.removeData("isOnExam");
+    this.quitExam();
+  }
 
-    // Changes stats
-    this.maxProgress = StringParser.parseFormula(
-      courseSettings.formula_maxProgress,
-      this.filters.maxProgress,
-      this.filters.passed
-    );
-    for (let i = 0; i < this.reqAttributeValues.length; i++) {
-      this.reqAttributeValues[i] = StringParser.parseFormula(
-        courseSettings.formula_reqAttributeValue,
-        new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
+  quitExam() {
+    if (!this.isOnExam) {
+      sendError("You are not on an exam for this course.", 3);
+    } else {
+      this.isOnExam = false;
+      if (--PlayerData.examsTaking === 0) {
+        PlayerData.isOnExam = false;
+      }
+      this.element.removeData("isOnExam");
+
+      this.updateStats(false);
+
+      // Immediately updates the style if there's still an exam available.
+      if (this.canTakeExam()) {
+        this.element.setData("canTakeExam");
+      }
+    }
+  }
+
+  updateStats(isForExam = false) {
+    // When taking an exam, the stats required for completion are greatly increased.
+    if (isForExam) {
+      this.maxProgress = StringParser.parseFormula(
+        examSettings.formula_maxProgress,
+        this.filters.maxProgress,
+        this.filters.nextLevel
+      );
+      for (let i = 0; i < this.reqAttributeValues.length; i++) {
+        this.reqAttributeValues[i] = StringParser.parseFormula(
+          examSettings.formula_reqAttributeValue,
+          new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
+          this.filters.nextLevel
+        );
+      }
+    } else {
+      this.maxProgress = StringParser.parseFormula(
+        courseSettings.formula_maxProgress,
+        this.filters.maxProgress,
+        this.filters.passed
+      );
+      for (let i = 0; i < this.reqAttributeValues.length; i++) {
+        this.reqAttributeValues[i] = StringParser.parseFormula(
+          courseSettings.formula_reqAttributeValue,
+          new CustomFilter("{attribute-req}", () => this.config.reqAttributeValues[i]),
+          this.filters.passed
+        );
+      }
+      this.tigerSpiritReward = StringParser.parseFormula(
+        courseSettings.formula_tigerSpiritReward,
+        this.filters.TSReward,
         this.filters.passed
       );
     }
-    this.tigerSpiritReward = StringParser.parseFormula(
-      courseSettings.formula_tigerSpiritReward,
-      this.filters.TSReward,
-      this.filters.passed
-    );
   }
 }
 

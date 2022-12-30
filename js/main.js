@@ -404,11 +404,13 @@ function createAttributes() {
  */
 function createCourses() {
   for (const courseKey in courses) {
+    /** @type {Course} */
     const course = courses[courseKey];
     let li = document.createElement("li");
     li.classList.add("course");
     li.dataset["course"] = courseKey;
 
+    // Displays course info on hover
     li.addEventListener("mouseenter", (e) => {
       let info = `<span style="color:rgb(15,15,155)">${course.courseTitle}</span><br><br>
       Passed Exams: <span class="option-value">${formatNumber(course.passedExams)}</span><br>
@@ -443,34 +445,58 @@ function createCourses() {
       info += `<br><br>${course.description}`;
       updateInfoBoard(info);
     });
-
     li.addEventListener("mouseleave", (e) => {
       clearInfoBoard();
     });
 
+    // Course text
     let text = document.createElement("p");
     text.classList.add("text");
     updateCourseText(text, course);
-
+    // Frame for the progress bar
     let frameBar = document.createElement("div");
     frameBar.classList.add("bar");
-
+    // The speed indicator (1X, 2X...)
     let indicator = document.createElement("p");
     indicator.classList.add("indicator");
-
+    // * Progress overlay
     let progressbar = document.createElement("div");
     progressbar.classList.add("progress");
 
-    frameBar.addEventListener("click", (e) => {
-      setActiveCourse_byElement(li);
-    });
+    registerButton(
+      frameBar,
+      (e) => {
+        setActiveCourse_byElement(li);
+      },
+      true,
+      false
+    );
 
     frameBar.appendChild(indicator);
     frameBar.appendChild(progressbar);
     li.appendChild(frameBar);
     li.appendChild(text);
-    HTMLCourses.appendChild(li);
 
+    // * Take Exam and Quit Exam Buttons.
+    let takeExamButton = document.createElement("div");
+    takeExamButton.classList.add("button", "button-overlay");
+    takeExamButton.setAttribute("name", "take-exam");
+    takeExamButton.innerHTML = "Exam";
+    registerButton(takeExamButton, (e) => {
+      course.takeExam();
+    });
+
+    let quitExamButton = document.createElement("div");
+    quitExamButton.classList.add("button", "button-overlay");
+    quitExamButton.setAttribute("name", "quit-exam");
+    quitExamButton.innerHTML = "Quit";
+    registerButton(quitExamButton, (e) => {
+      course.quitExam();
+    });
+
+    frameBar.append_chain(takeExamButton, quitExamButton);
+
+    HTMLCourses.appendChild(li);
     // Adds the element to the course
     course.element = li;
   }
@@ -611,9 +637,10 @@ function updateAttributeText_detailed(element, attribute) {
 
 /**
  * Sets the active course for display purpose
- * @param {*} courseKey Course Name
+ * @param {string} courseKey Course Name
+ * @param {boolean} playSound Whether to play the SFX (for user interaction)
  */
-function setActiveCourse(courseKey) {
+function setActiveCourse(courseKey, playSound = true) {
   const target = courses[courseKey];
   // Invalid course key
   if (!target) {
@@ -642,16 +669,17 @@ function setActiveCourse(courseKey) {
     }
   }
 
-  SFX_selectCourse.play();
+  if (playSound) SFX_selectCourse.play();
 }
 
 /**
  * Sets the active course for display purpose
- * @param {*} courseElement HTML element
+ * @param {HTMLElement} courseElement HTML element
+ * @param {boolean} playSound Whether to play the SFX (for user interaction)
  */
-function setActiveCourse_byElement(courseElement) {
+function setActiveCourse_byElement(courseElement, playSound) {
   let courseKey = courseElement.getData("course");
-  setActiveCourse(courseKey);
+  setActiveCourse(courseKey, playSound);
 }
 
 /**
@@ -666,18 +694,25 @@ function updateCourses() {
     text.style.padding = "";
   }
 
+  // Adds progress to the active course
+  if (hasActiveCourse()) {
+    getActiveCourse().addProgress();
+    // Shows the current course completion speed multiplier
+    getActiveCourse().element.querySelector(".indicator").innerHTML = `${formatNumber(activeCourseSpeedMultiplier)}X`;
+  }
+
   for (const element of HTMLCourses.children) {
     // Gets the element's corresponding course
     let courseKey = element.getData("course");
     /** @type {Course} */
     let course = courses[courseKey];
 
-    // Adds progress to the active course
-    if (element.containsData("active", "true")) {
-      course.addProgress();
-      // Show the current course completion speed multiplier
-      element.querySelector(".indicator").innerHTML = `${formatNumber(activeCourseSpeedMultiplier)}X`;
-    }
+    // // Adds progress to the active course
+    // if (element.containsData("active", "true")) {
+    //   course.addProgress();
+    //   // Shows the current course completion speed multiplier
+    //   element.querySelector(".indicator").innerHTML = `${formatNumber(activeCourseSpeedMultiplier)}X`;
+    // }
 
     // Always updates HTML element for visuals (progress and base value may be added in other ways)
     element.querySelector(".progress").style.width = `${course.getProgressPercentage()}%`;
@@ -688,7 +723,7 @@ function updateCourses() {
     if (element.querySelector(".bar").matches(":hover")) {
       // ! course.completionsTilExam evaluates a formula, which is expensive.
       // TODO: Update the text every second instead of every frame.
-      element.querySelector(".text").innerHTML = `Exam: ${formatNumber(course.completionsTilExam)} completions`;
+      element.querySelector(".text").innerHTML = `Exam: ${formatNumber(course.completionsTilExam)} completions left`;
       for (let i = 0; i < course.reqAttributeNames.length; i++) {
         const key = course.reqAttributeNames[i];
         const attribute = attributes[key];
@@ -919,13 +954,22 @@ function calculateOfflineIncome(offlineTime) {
 /**
  * Registers a button with a onclick callback function
  * This includes playing the SFX when clicked.
- * @param {*} button HTML Element of the button
- * @param {*} callback onclick function
+ * @param {HTMLElement} button HTML Element of the button
+ * @param {Function} callback onclick function
+ * @param {boolean} isStrict If true, clicking on a parent/child element that also has "click" event listeners will not trigger callback for this.
  */
-function registerButton(button, callback) {
+function registerButton(button, callback, isStrict = true, playSound = true) {
   button.addEventListener("click", (e) => {
+    if (isStrict && e.currentTarget !== e.target && e.target.hasEventListener("click")) {
+      // console.log("prevented button from `click` trigger");
+      // console.log(button);
+      // console.log(callback);
+      return;
+    }
+    // console.log("triggered `click` event listener for button");
+    // console.log(button);
     callback(e);
-    SFX_clickButton.play();
+    if (playSound) SFX_clickButton.play();
   });
 }
 
