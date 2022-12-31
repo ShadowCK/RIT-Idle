@@ -122,7 +122,8 @@ function assign(objA, objB, ignores = []) {
   }
 }
 
-Object.defineProperty(Object.prototype, "assign_safe", { value: assign, enumerable: false });
+// Static function, add to the constructor! (Object.prototype for methods)
+Object.defineProperty(Object, "assign_safe", { value: assign, enumerable: false });
 
 /**
  * Uses JSON to hard copy-paste properties of source obj into target obj.

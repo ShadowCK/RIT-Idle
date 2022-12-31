@@ -1,3 +1,5 @@
+const playerData_key = "player data";
+
 //#region Helper Methods
 /**
  * Loads a float from localStorage. If no value is stored, uses the fallback instead.
@@ -84,6 +86,10 @@ function loadObj(base, key, fallback, postProcess, ...ignores) {
  * Loads the game from LocalStorage, before creating HTML elements.
  */
 function loadGame_beforeHTML() {
+  // Loads player data
+  let loadedPlayerData = loadObj({}, playerData_key, {});
+  Object.assign_safe(PlayerData, loadedPlayerData);
+
   // No value stored, assigns a default value (as of first run)
   totalGameTime = loadFloat_keep(totalGameTime_key, totalGameTime, 0);
 
@@ -191,11 +197,17 @@ function loadGame_afterHTML() {
  * Saves the game to LocalStorage.
  */
 function saveGame() {
+  // Saves player data
+  // TODO: All other variables should be stored in PlayerData. And PlayerData thus has to have a singleton for easier serialization & deserialization.
+  // * Object.fromEntries() is a rather new method added in ES2019 (ES10.)
+  // * Object.entries() is part of ES2017 (ES8) specification.
+  localStorage.setItem(playerData_key, JSON.stringify(Object.fromEntries(Object.entries(PlayerData))));
+
   localStorage.setItem(totalGameTime_key, totalGameTime);
   localStorage.setItem(tigerSpirit_key, tigerSpirit);
   lastSaveTimestamp = Date.now();
   localStorage.setItem(lastSaveTimestamp_key, lastSaveTimestamp);
-  localStorage.setItem(averageTigerSpiritPerSecond, averageTigerSpiritPerSecond_key);
+  localStorage.setItem(averageTigerSpiritPerSecond_key, averageTigerSpiritPerSecond);
   localStorage.setItem(reincarnations_key, reincarnations);
   localStorage.setItem(reincarnateBonus_key, reincarnateBonus);
 

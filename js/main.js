@@ -37,10 +37,10 @@ const averageTigerSpiritPerSecond_key = "average tiger spirit per second";
 let tigerSpiritIncomeTracker = [];
 
 let reincarnations;
-let reincarnations_key = "reincarnations";
+const reincarnations_key = "reincarnations";
 
 let reincarnateBonus; // A unique multiplier that doesn't depend on Upgrade System
-let reincarnateBonus_key = "reincarnate bonus";
+const reincarnateBonus_key = "reincarnate bonus";
 
 const attributes = {}; // Object literal as dictionary
 
