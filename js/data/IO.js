@@ -1,4 +1,5 @@
 const playerData_key = "player data";
+const HTMLData_key = "HTML data";
 
 //#region Helper Methods
 /**
@@ -179,6 +180,11 @@ function resetHTML() {
  * (for those that depend on/interact with/manage HTML elements)
  */
 function loadGame_afterHTML() {
+  // Loads previous innerHTML of "main"
+  ElementDataManager.instance.loadData();
+  // Adds "lost" attributes to the newly-generated elements using loaded data.
+  ElementDataManager.instance.restoreData();
+
   activeCourseName = localStorage.getItem(activeCourseName_key);
   if (isValidString(activeCourseName)) {
     setActiveCourse(activeCourseName);
@@ -231,7 +237,10 @@ function saveGame() {
   localStorage.setItem(activeCourseName_key, activeCourseName);
   localStorage.setItem(activeAttributeName_key, activeAttributeName);
 
-  //console.log(`Game Saved @ ${new Date()}`);
+  // Saves current innerHTML of "main"!
+  ElementDataManager.instance.saveData();
+
+  console.log(`Game Saved @ ${new Date()}`);
 }
 
 /**
@@ -252,7 +261,72 @@ function saveGame_notify() {
     randomCoordinate(50, 150, 20, 60),
     { x: 0, y: -1 },
     10
-  ).markAsImportant();
+  ).addTag("important");
 }
 
 //#endregion
+
+/**
+ * Stores the end-state data of the last session. Generally, manages and processes elements.
+ */
+class ElementDataManager {
+  static _instance = null;
+  /** @type {ElementDataManager} */
+  static get instance() {
+    if (!this._instance) {
+      this._instance = new ElementDataManager();
+    }
+    return this._instance;
+  }
+
+  constructor() {
+    // Prevents any manual constructor call bypassing the instance() getter.
+    if (!ElementDataManager._instance) {
+      ElementDataManager._instance = this;
+      this.loadData();
+    }
+    return ElementDataManager._instance;
+  }
+
+  /**
+   * Saves data of the `<main>` tag for next session.
+   */
+  saveData() {
+    const HTMLData = document.querySelector("main").innerHTML;
+    localStorage.setItem(HTMLData_key, HTMLData);
+  }
+
+  /**
+   * Loads innerHTML data of the `<main>` tag saved last time.
+   */
+  loadData() {
+    let innerHTML = localStorage.getItem(HTMLData_key);
+    this.data = innerHTML ? document.createElement("main", null, { innerHTML }) : null;
+  }
+
+  /**
+   * Because the elements are regenerated (as they should) every session (or manually called,) losing their
+   * previous dataset and attributes, this function reverts them to previous statuses.
+   * @returns {void} Does nothing if no saved data.
+   */
+  restoreData() {
+    if (!this.data) return;
+
+    // Iterates all elements in previous data.
+    for (const element of this.data.querySelectorAll("*")) {
+      // Elements with no id has no unique identification and therefore can't give back their data.
+      if (!element.id) continue;
+      // Gets the element with same `id` in the current document.
+      const newElement = document.getElementById(element.id);
+      // No element with the same `id` exists
+      if (!newElement) {
+        throw new Error(`An error occurred in \`restoreData\`: no element with id \`${element.id}\` found.`);
+      }
+      // Sets back the attributes (`class`, `dataset` are also attributes).
+      // * To be precise, `dataset` is wrapped up `data-xxx` attributes.
+      for (const attr of Object.values(element.attributes)) {
+        newElement.setAttribute(attr.name, attr.value);
+      }
+    }
+  }
+}

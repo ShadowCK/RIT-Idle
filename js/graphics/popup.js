@@ -25,17 +25,13 @@ class PopUp {
 
     // Creates an HTML element for this popup.
     // This is the frame for text layout
-    let element = document.createElement("div");
-    element.classList.add("popup");
+    let element = document.createElement("div", { class: "popup" });
 
     // This is the centered text
-    let p = document.createElement("p");
-    p.classList.add("text");
-    p.innerHTML = message;
-    element.appendChild(p);
+    let p = document.createElement("p", { class: "text" }, { innerHTML: message });
     this.textChild = p;
 
-    this.parentElement.appendChild(element);
+    this.parentElement.append(element.append_chain(p));
     this.selfElement = element;
     // Initial translate
     this.selfElement.style.transform = `translate(${this.offset.x}px, ${this.offset.y}px)`;
@@ -85,24 +81,9 @@ class PopUp {
   }
 }
 
-function createPopUp(
-  parentElement = currentPopupOverlay,
-  message,
-  duration,
-  offset,
-  direction,
-  speed
-) {
+function createPopUp(parentElement = currentPopupOverlay, message, duration, offset, direction, speed) {
   let index = popups.length;
-  let popup = new PopUp(
-    index,
-    parentElement,
-    message,
-    duration,
-    offset,
-    direction,
-    speed
-  );
+  let popup = new PopUp(index, parentElement, message, duration, offset, direction, speed);
   popups.push(popup);
 
   return popup;
@@ -121,47 +102,18 @@ function sendMessage(
 ) {
   switch (type) {
     case messageType.normal:
-      createPopUp(
-        currentPopupOverlay,
-        message,
-        duration,
-        offset,
-        direction,
-        speed
-      );
+      createPopUp(currentPopupOverlay, message, duration, offset, direction, speed);
       break;
     case messageType.important:
-      createPopUp(
-        currentPopupOverlay,
-        message,
-        duration,
-        offset,
-        direction,
-        speed
-      ).addTag("important");
+      createPopUp(currentPopupOverlay, message, duration, offset, direction, speed).addTag("important");
       break;
     case messageType.error:
-      createPopUp(
-        currentPopupOverlay,
-        message,
-        duration,
-        offset,
-        direction,
-        speed
-      )
-        .addTag("important")
-        .addTag("error");
+      createPopUp(currentPopupOverlay, message, duration, offset, direction, speed).addTag("important").addTag("error");
       SFX_error.play();
       break;
   }
 }
 
-function sendError(
-  message = "Unkown",
-  duration = 3,
-  offset = undefined,
-  direction = undefined,
-  speed = 10
-) {
+function sendError(message = "Unkown", duration = 3, offset = undefined, direction = undefined, speed = 10) {
   sendMessage(messageType.error, message, duration, offset, direction, speed);
 }

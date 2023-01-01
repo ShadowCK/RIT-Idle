@@ -125,7 +125,7 @@ body {
   box-sizing: content-box;
   width: 1280px;
   height: 720px;
-  margin: calc((100vh - 720px) / 2 - 5px) auto 0 auto;
+  margin: calc((100vh - 720px) / 2 - 5px) auto;
   border: solid 5px black;
   border-radius: 8px;
   background-color: rgb(206, 206, 206);
@@ -278,6 +278,8 @@ body {
   border: solid 2px black;
   background-color: gray;
   filter: drop-shadow(4px 4px 2px #cfcfcf);
+
+  cursor: grab;
 }
 
 .course .bar:hover,
@@ -408,6 +410,8 @@ body {
   border: solid 2px black;
 
   position: relative;
+
+  cursor: pointer;
 }
 
 .upgrade:hover {
@@ -667,6 +671,7 @@ body {
 
   background-color: rgba(255, 255, 255, 0.2);
   position: relative;
+  bottom: calc((100vh - 720px) / 2 - 10px);
   border-radius: 8px;
 }
 
@@ -729,4 +734,14 @@ body {
 /* On exam, display Quit Exam Button */
 .course[data-is-on-exam] .button-overlay[name="quit-exam"] {
   display: flex;
+}
+
+#container-drops {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: -10000;
 }

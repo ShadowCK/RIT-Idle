@@ -278,8 +278,6 @@ class Course {
    */
   completeExam() {
     this.passedExams++;
-    // Do not add exceeding exam progress to regular completions.
-    this.progress = 0;
     SFX_completeExam.play();
 
     sendMessage(
@@ -292,6 +290,8 @@ class Course {
   }
 
   quitExam() {
+    // Do not add exam progress to regular completions.
+    this.progress = 0;
     if (!this.isOnExam) {
       sendError("You are not on an exam for this course.", 3);
     } else {

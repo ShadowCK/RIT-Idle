@@ -323,8 +323,8 @@ Object.defineProperty(Array.prototype, "lastIndex", { value: () => this.length -
 
 /**
  * Gets a variable from the element's dataset.
- * @param {*} key Key for the variable
- * @returns Value of the variable
+ * @param {string} key Key for the variable
+ * @returns {string} Value of the variable
  */
 HTMLElement.prototype.getData = function (key) {
   return this.dataset[key];
@@ -332,6 +332,8 @@ HTMLElement.prototype.getData = function (key) {
 
 /**
  * Writes a variable to the element's dataset.
+ * Because the default of `value` is `""`, won't set the data to be
+ * a string `"undefined"` as directly calling `this.dataset[key] = value`;
  * @param {string} key Key for the variable
  * @param {*} value Value of the variable
  */
@@ -348,7 +350,7 @@ HTMLElement.prototype.removeData = function (key) {
 };
 
 /**
- * @param {string} key
+ * @param {string} key Key of `dataset`'s property
  * @param {*} value If left undefined, won't check for the value.
  * @returns If the element's dataset contains a variable named as `key`, with specified value.
  */
@@ -532,7 +534,7 @@ function isValidString(string) {
 }
 
 /**
- * Chaining version of HTMLElement.prototype.append(nodes).
+ * Chainable version of HTMLElement.prototype.append(nodes).
  * append() returns nothing, making it unable to be chained
  * @param  {...Node} nodes
  * @returns {HTMLElement} this
@@ -546,15 +548,17 @@ HTMLElement.prototype.append_chain = function (...nodes) {
   return this;
 };
 
+// Overwrites the original `addEventListener`
 // EventTarget is a DOM interface implemented by objects that can receive events and may have listeners for them.
 EventTarget.prototype._addEventListener = EventTarget.prototype.addEventListener;
-
 /**
- * Modification (overwriting) to the original `addEventListener`.
+ * Chainable version of original `addEventListener` and keeps track of all added event listeners.
+ * TODO: Still lacks a modified version of `removeEventListener` to fully implement tracking!
  * Reference: https://www.sqlpac.com/en/documents/javascript-listing-active-event-listeners.html
  * @param {string} type
- * @param {boolean} listener
+ * @param {boolean} listener Callback function to execute on event
  * @param {AddEventListenerOptions | boolean} options
+ * @returns {EventTarget} this
  */
 EventTarget.prototype.addEventListener = function (type, listener, options) {
   if (options == undefined) options = false;
@@ -565,13 +569,13 @@ EventTarget.prototype.addEventListener = function (type, listener, options) {
   if (!this.eventListenerList[type]) this.eventListenerList[type] = [];
   // Stores the event listener
   this.eventListenerList[type].push({ listener: listener, options: options });
+  return this;
 };
 
 /**
- * Gets the array for the event listeners of target type
+ * Gets the array for the event listeners of target type or the entire dictionary if `type` is invalid.
  * @param {string} type Type of the event listeners
- * @returns {Function[]} Array of event listeners
- * * Do not write to the returned object
+ * ! Do not write to the returned object
  */
 EventTarget.prototype.getEventListeners = function (type) {
   // ? Maybe returning null is better, because it's not heavily used.
@@ -607,6 +611,10 @@ function showEvents(element) {
   _showEvents(element.getEventListeners());
 }
 
+/**
+ * Helper method for {@link showEvents}
+ * @param {Object} events Entire `eventListenerList` returned by `EventTarget.getEventListeners(type)` if `type==undefined`
+ */
 function _showEvents(events) {
   for (let event of Object.keys(events)) {
     console.log(event + " ----------------> " + events[event].length);
@@ -615,3 +623,27 @@ function _showEvents(events) {
     }
   }
 }
+
+// Overwrites document.createElement().
+Document.prototype._createElement = Document.prototype.createElement;
+/**
+ * Creates an HTMLElement with defiend `attribtues` and `properties`.
+ * This saves the headache to add them one by one.
+ * @param {string} tagName The name of an element.
+ * @param {Object} attributes Object literal storing the entries for attributes.
+ * @param {Object} properties Object literal storing the entries for properties.
+ * @param {ElementCreationOptions} options See {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement}
+ * @returns {HTMLElement}
+ */
+Document.prototype.createElement = function (tagName, attributes, properties, options) {
+  /** @type {HTMLElement} */
+  let element = this._createElement(tagName, options);
+  // Adds attribtues to the element
+  for (const key in attributes) {
+    element.setAttribute(key, attributes[key]);
+  }
+  for (const key in properties) {
+    element[key] = properties[key];
+  }
+  return element;
+};

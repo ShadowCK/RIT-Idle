@@ -63,11 +63,17 @@ let activeCourseSpeedMultiplier;
 //#endregion
 
 //#region HTML Elements (for graphics and interactions)
+/** @type {DOMExtension.HTMLElement} */
 let navbar = document.querySelector("#navbar");
+/** @type {DOMExtension.HTMLElement} */
 let HTMLAttributes = document.querySelector("#attributes ul");
+/** @type {DOMExtension.HTMLElement} */
 let HTMLUpgrades = document.querySelector("#upgrades div");
+/** @type {DOMExtension.HTMLElement} */
 let HTMLCourses = document.querySelector("#courses ul");
+/** @type {DOMExtension.HTMLElement} */
 let infoBoard = document.querySelector("#infoBoard");
+/** @type {DOMExtension.HTMLElement} */
 let combatPopupOverlay = document.querySelector("#combat .popupOverlay");
 //TODO: this is temporary
 currentPopupOverlay = combatPopupOverlay;
@@ -232,11 +238,13 @@ function init() {
 
     for (let i = 0; i < num; i++) {
       // Creates drop
-      let drop = document.createElement("div");
-      drop.className = "drop";
+      let drop = document.createElement("div", { class: "drop" });
+      const containerID = "container-drops";
       // Adds the drop to a container, which is the whole page here.
-      let container = document.querySelector("html");
-      container.appendChild(drop);
+      let container =
+        document.getElementById(containerID) ||
+        document.documentElement.append_chain(document.createElement("div", { id: containerID }));
+      container.append(drop);
       // Sets a random color;
       let RG = Math.random() * 50 + 173;
       drop.style.backgroundColor = `rgb(${RG}, ${RG}, 255)`;
@@ -357,12 +365,12 @@ function processHeavyTasks() {
 function createAttributes() {
   for (const attributeKey in attributes) {
     const attribute = attributes[attributeKey];
-    let li = document.createElement("li");
-    li.classList.add("attribute");
-    if (attribute.influential) {
-      li.classList.add("influential");
-    }
-    li.dataset["attribute"] = attributeKey;
+    /** @type {DOMExtension.HTMLElement} */
+    let li = document.createElement("li", {
+      id: `attribute-${attributeKey}`,
+      class: `attribute ${attribute.influential ? "influential" : ""}`,
+    });
+    li.setData("attribute", attributeKey);
 
     li.addEventListener("mouseenter", (e) => {
       let info = `<span style="color:rgb(15,15,155)">${capitalizeFirstChar(attributeKey)}</span><br><br>${
@@ -375,24 +383,17 @@ function createAttributes() {
       clearInfoBoard();
     });
 
-    let text = document.createElement("p");
-    text.classList.add("text");
+    let text = document.createElement("p", { class: "text" });
     updateAttributeText(text, attribute);
 
-    let frameBar = document.createElement("div");
-    frameBar.classList.add("bar");
-
-    let progressbar = document.createElement("div");
-    progressbar.classList.add("progress");
-
+    let frameBar = document.createElement("div", { class: "bar" });
     frameBar.addEventListener("click", (e) => {
       setActiveAttribute_byElement(li);
     });
 
-    frameBar.appendChild(progressbar);
-    li.appendChild(frameBar);
-    li.appendChild(text);
-    HTMLAttributes.appendChild(li);
+    let progressbar = document.createElement("div", { class: "progress" });
+
+    HTMLAttributes.appendChild(li.append_chain(frameBar.append_chain(progressbar), text));
 
     // Adds the element to the attribute
     attribute.element = li;
@@ -406,9 +407,8 @@ function createCourses() {
   for (const courseKey in courses) {
     /** @type {Course} */
     const course = courses[courseKey];
-    let li = document.createElement("li");
-    li.classList.add("course");
-    li.dataset["course"] = courseKey;
+    let li = document.createElement("li", { id: `course-${courseKey}`, class: "course" });
+    li.setData("course", courseKey);
 
     // Displays course info on hover
     li.addEventListener("mouseenter", (e) => {
@@ -450,18 +450,14 @@ function createCourses() {
     });
 
     // Course text
-    let text = document.createElement("p");
-    text.classList.add("text");
+    let text = document.createElement("p", { class: "text" });
     updateCourseText(text, course);
     // Frame for the progress bar
-    let frameBar = document.createElement("div");
-    frameBar.classList.add("bar");
+    let frameBar = document.createElement("div", { class: "bar" });
     // The speed indicator (1X, 2X...)
-    let indicator = document.createElement("p");
-    indicator.classList.add("indicator");
+    let indicator = document.createElement("p", { class: "indicator" });
     // * Progress overlay
-    let progressbar = document.createElement("div");
-    progressbar.classList.add("progress");
+    let progressBar = document.createElement("div", { class: "progress" });
 
     registerButton(
       frameBar,
@@ -472,31 +468,28 @@ function createCourses() {
       false
     );
 
-    frameBar.appendChild(indicator);
-    frameBar.appendChild(progressbar);
-    li.appendChild(frameBar);
-    li.appendChild(text);
-
     // * Take Exam and Quit Exam Buttons.
-    let takeExamButton = document.createElement("div");
-    takeExamButton.classList.add("button", "button-overlay");
-    takeExamButton.setAttribute("name", "take-exam");
-    takeExamButton.innerHTML = "Exam";
+    let takeExamButton = document.createElement(
+      "div",
+      { class: "button button-overlay", name: "take-exam" },
+      { innerHTML: "Exam" }
+    );
     registerButton(takeExamButton, (e) => {
       course.takeExam();
     });
 
-    let quitExamButton = document.createElement("div");
-    quitExamButton.classList.add("button", "button-overlay");
-    quitExamButton.setAttribute("name", "quit-exam");
-    quitExamButton.innerHTML = "Quit";
+    let quitExamButton = document.createElement(
+      "div",
+      { class: "button button-overlay", name: "quit-exam" },
+      { innerHTML: "Quit" }
+    );
     registerButton(quitExamButton, (e) => {
       course.quitExam();
     });
 
-    frameBar.append_chain(takeExamButton, quitExamButton);
-
-    HTMLCourses.appendChild(li);
+    HTMLCourses.append_chain(
+      li.append_chain(frameBar.append_chain(indicator, progressBar, takeExamButton, quitExamButton), text)
+    );
     // Adds the element to the course
     course.element = li;
   }
@@ -509,8 +502,7 @@ function createUpgrades() {
   let index = 0;
   for (const upgradeKey in upgrades) {
     const upgrade = upgrades[upgradeKey];
-    let div = document.createElement("div");
-    div.classList.add("upgrade");
+    let div = document.createElement("div", { class: "upgrade" });
     div.setData("upgrade", upgradeKey);
     div.setData("bought", upgrade.bought);
 
@@ -532,12 +524,9 @@ function createUpgrades() {
     div.addEventListener("mouseenter", (e) => updateInfoBoard_mouseEnterUpgrade(div));
     div.addEventListener("mouseleave", clearInfoBoard);
 
-    let imageOverlay = document.createElement("img");
-    imageOverlay.classList.add("overlay");
-    imageOverlay.src = `images/upgrade${index}.png`;
-    div.appendChild(imageOverlay);
+    let imageOverlay = document.createElement("img", { class: "overlay", src: `images/upgrade${index}.png` });
 
-    HTMLUpgrades.appendChild(div);
+    HTMLUpgrades.append(div.append_chain(imageOverlay));
     upgrade.element = this;
 
     index++;

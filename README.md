@@ -63,7 +63,7 @@ This is an idle game where you play as a freshman in <abbr title="Rochester Inst
 
   - Special abilities that can benefit you in various ways.
 
-- [ ] Exams
+- [x] Exams
 
   - Exams are like milestones. They become available at specific completion numbers, have a multiplied completion time and attribute requirement. Once you finish an exam, your income as well as the attribute requirements will increase. As a result, you may find yourself getting less average income at the beginning, but since you can always max out the completion speed, the expected value will eventually be higher.
 
