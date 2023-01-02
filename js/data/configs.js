@@ -292,14 +292,13 @@ const upgradeTemplates = [
   { type: UpgradeType.flat, value: 1, price: 100, valuePower: 1.1, pricePower: 1.5 },
   { type: UpgradeType.flat, value: 3.25e1, price: 2.53e6, valuePower: 1.1022, pricePower: 1.5 },
   { type: UpgradeType.flat, value: 1.11e3, price: 6.38e10, valuePower: 1.1044, pricePower: 1.5 },
-  { type: UpgradeType.multiplier, value: 2, price: 1e5, pricePower: 10 },
+  { type: UpgradeType.multiplier, value: 2, price: 1e5, pricePower: 1e3 },
 ];
 
 /**
  * @returns {Map<string, Upgrade>} Created upgrade configs (object literal)
  */
 function createUpgradeConfigs() {
-  debugger;
   const configs = {};
   for (const attributeKey in upgradeNames) {
     let upgradeIndex = 0;

@@ -647,3 +647,14 @@ Document.prototype.createElement = function (tagName, attributes, properties, op
   }
   return element;
 };
+
+/**
+ * Updates the innerHTML of an HTMLElement if the new innerHTML is not the same.
+ * @param {HTMLElement} element
+ * @param {string} newHTML New innerHTML for `element`
+ */
+function setInnerHTML(element, newHTML) {
+  // * For the sake of resources. Getting innerHTML is much less computationally expensive than setting it.
+  if (element.innerHTML === newHTML) return;
+  element.innerHTML = newHTML;
+}

@@ -499,7 +499,6 @@ function createCourses() {
  * Called in init(). Creates HTML elements for upgrades.
  */
 function createUpgrades() {
-  let index = 0;
   for (const upgradeKey in upgrades) {
     const upgrade = upgrades[upgradeKey];
     let div = document.createElement("div", { class: "upgrade" });
@@ -528,8 +527,6 @@ function createUpgrades() {
     //HTMLUpgrades.append(div.append_chain(imageOverlay));
     HTMLUpgrades.append(div);
     upgrade.element = this;
-
-    index++;
   }
 }
 
@@ -599,11 +596,11 @@ function updateAttributes() {
 
 /**
  * Updates the HTML display for an attribute
- * @param {*} element Attribute HTMLElement
- * @param {*} attribute Attribute object
+ * @param {HTMLElement} element Attribute HTMLElement
+ * @param {Attribute} attribute Attribute object
  */
 function updateAttributeText(element, attribute) {
-  element.innerHTML = `${attribute.name}: ${formatNumber(attribute.computeValue(), 2)}`;
+  setInnerHTML(element, `${attribute.name}: ${formatNumber(attribute.computeValue(), 2)}`);
 }
 
 /**
@@ -612,16 +609,19 @@ function updateAttributeText(element, attribute) {
  * @param {Attribute} attribute Attribute object
  */
 function updateAttributeText_detailed(element, attribute) {
-  element.innerHTML = `${attribute.name.substring(0, 3).toUpperCase()}: (${formatNumber(
-    attribute.baseValue,
-    2
-  )}+<span style="color:rgb(44,124,212)">${formatNumber(
-    attribute.getFlatBonus(),
-    2
-  )}</span>)*<span style="color:rgb(44,124,212)">${formatNumber(
-    attribute.getMultiplierBonus(),
-    2
-  )}</span>=${formatNumber(attribute.computeValue(), 2)}`;
+  setInnerHTML(
+    element,
+    `${attribute.name.substring(0, 3).toUpperCase()}: (${formatNumber(
+      attribute.baseValue,
+      2
+    )}+<span style="color:rgb(44,124,212)">${formatNumber(
+      attribute.getFlatBonus(),
+      2
+    )}</span>)*<span style="color:rgb(44,124,212)">${formatNumber(
+      attribute.getMultiplierBonus(),
+      2
+    )}</span>=${formatNumber(attribute.computeValue(), 2)}`
+  );
 }
 
 /**
@@ -687,7 +687,10 @@ function updateCourses() {
   if (hasActiveCourse()) {
     getActiveCourse().addProgress();
     // Shows the current course completion speed multiplier
-    getActiveCourse().element.querySelector(".indicator").innerHTML = `${formatNumber(activeCourseSpeedMultiplier)}X`;
+    setInnerHTML(
+      getActiveCourse().element.querySelector(".indicator"),
+      `${formatNumber(activeCourseSpeedMultiplier)}X`
+    );
   }
 
   for (const element of HTMLCourses.children) {
@@ -712,7 +715,7 @@ function updateCourses() {
     if (element.querySelector(".bar").matches(":hover")) {
       // ! course.completionsTilExam evaluates a formula, which is expensive.
       // TODO: Update the text every second instead of every frame.
-      element.querySelector(".text").innerHTML = `Exam: ${formatNumber(course.completionsTilExam)} completions left`;
+      setInnerHTML(element.querySelector(".text"), `Exam: ${formatNumber(course.completionsTilExam)} completions left`);
       for (let i = 0; i < course.reqAttributeNames.length; i++) {
         const key = course.reqAttributeNames[i];
         const attribute = attributes[key];
@@ -720,11 +723,14 @@ function updateCourses() {
         const text = attribute.element.querySelector(".text");
         text.style.color = "rgb(15, 176, 162)";
         text.style.padding = "2px";
-        text.innerHTML = `${attribute.name}: ${formatNumber(
-          attribute.computeValue()
-        )}<span style="color: rgb(255, 42, 53)">/${formatNumber(
-          value
-        )}</span><span style="color: rgb(15, 176, 152); font-size: 0.7em"> (at 1X)</span>`;
+        setInnerHTML(
+          text,
+          `${attribute.name}: ${formatNumber(
+            attribute.computeValue()
+          )}<span style="color: rgb(255, 42, 53)">/${formatNumber(
+            value
+          )}</span><span style="color: rgb(15, 176, 152); font-size: 0.7em"> (at 1X)</span>`
+        );
       }
     }
   }
@@ -732,24 +738,28 @@ function updateCourses() {
 
 /**
  * Updates the HTML display for a course
- * @param {*} element HTML element
- * @param {*} course course object
+ * @param {HTMLElement} element HTML element
+ * @param {Course} course course object
  */
 function updateCourseText(element, course) {
-  element.innerHTML = `${course.name}: ${formatNumber(course.completions)} LV.${formatNumber(course.passedExams)} (${
-    course.grade
-  })`;
+  setInnerHTML(
+    element,
+    `${course.name}: ${formatNumber(course.completions)} LV.${formatNumber(course.passedExams)} (${course.grade})`
+  );
 }
 
 /**
  * Updates the Info section
  */
 function updateInfo() {
-  document.querySelector(".tigerSpirits span").innerHTML = `${formatNumber(
-    tigerSpirit
-  )}<span style="color:rgb(0,128,0)">+${formatNumber(averageTigerSpiritPerSecond)}/s</span>`;
-  document.querySelector(".totalGameTime span").innerHTML = getTimeString(totalGameTime);
-  document.querySelector(".reincarnationBonus span").innerHTML = `${formatNumber(reincarnateBonus)}X`;
+  setInnerHTML(
+    document.querySelector(".tigerSpirits span"),
+    `${formatNumber(tigerSpirit)}<span style="color:rgb(0,128,0)">+${formatNumber(
+      averageTigerSpiritPerSecond
+    )}/s</span>`
+  );
+  setInnerHTML(document.querySelector(".totalGameTime span"), getTimeString(totalGameTime));
+  setInnerHTML(document.querySelector(".reincarnationBonus span"), `${formatNumber(reincarnateBonus)}X`);
 }
 
 /**
@@ -890,7 +900,7 @@ function computeAverageTigerSpiritPerSecond() {
 function pauseGame() {
   let p = pausedPrompt.querySelector("p");
   p.style.fontSize = "";
-  p.innerHTML = "Paused...";
+  setInnerHTML(p, "Paused...");
   paused = true;
   pausedPrompt.setData("paused");
 }
@@ -928,9 +938,12 @@ function calculateOfflineIncome(offlineTime) {
   // Cancels transition for this one (or the visual looks weird)
   p.style.transition = "none";
   p.style.fontSize = "2em";
-  p.innerHTML = `You're back!<br>For the past <span style="color:white;">${getTimeString(
-    offlineTime
-  )}</span> (capped at 24h),<br>you earned <span style="color:white;">${income.toFixed()}</span> tiger spirits!`;
+  setInnerHTML(
+    p,
+    `You're back!<br>For the past <span style="color:white;">${getTimeString(
+      offlineTime
+    )}</span> (capped at 24h),<br>you earned <span style="color:white;">${income.toFixed()}</span> tiger spirits!`
+  );
   // Had to set a delay; otherwise the transition still plays for the first time (but not for later.) Weird.
   setTimeout(() => {
     p.style.transition = "";
