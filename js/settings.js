@@ -13,7 +13,7 @@ const courseSettings = {
   // passed is current level
   formula_maxProgress: "{max-progress}*1.2^{passed}",
   formula_reqAttributeValue: "{attribute-req}*1.5^{passed}",
-  formula_tigerSpiritReward: "{TS-reward}*1.25^{passed}",
+  formula_tigerSpiritReward: "{TS-reward}*1.35^{passed}",
 };
 
 //#endregion

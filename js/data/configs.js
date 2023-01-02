@@ -71,12 +71,21 @@ const courseConfigs = {
     `This course introduces students within the domain of game design and development to the fundamentals of computing through problem solving, abstraction, and algorithmic design.  Students will learn the basic elements of game software development, including problem decomposition, the design and implementation of game applications, and the testing/debugging of their designs.
   `
   ),
+  "IGME-110": new Course("IGME-110", [attributeKeys.aesthetics, attributeKeys.creativity], [3, 2], 30, 1).setDetails(
+    `Introduction to Interactive Media`,
+    `This course provides an overview of media in historical, current and future contexts. Incorporating lectures and discussion with hands on work involving written and interactive media assets, students examine the role of written and visual media from theoretical as well as practical perspectives.  The course also provides an introduction to interactive media development techniques, including digital media components and delivery environments.  Students will be required to write formal analysis and critique papers along with digital modes of writing including collaborative editing and effective presentation design.
+  `
+  ),
+  "MATH-131": new Course("MATH-131", [attributeKeys.math], [10], 60, 1).setDetails(
+    "Discrete Mathematics",
+    "This course is an introduction to the topics of discrete mathematics, including number systems, sets and logic, relations, combinatorial methods, graph theory, regular sets, vectors, and matrices."
+  ),
   "IGME-106": new Course(
     "IGME-106",
     [attributeKeys.programming, attributeKeys.mentality, attributeKeys.creativity],
-    [3, 1.5, 1.5],
-    30,
-    2
+    [10, 4, 6],
+    100,
+    1
   )
     .setDetails(
       `Game Development and Algorithmic Problem Solving II`,
@@ -84,22 +93,27 @@ const courseConfigs = {
   `
     )
     .addPreReq("IGME-105"),
-  "IGME-110": new Course("IGME-110", [attributeKeys.aesthetics, attributeKeys.creativity], [4, 3], 40, 3).setDetails(
-    `Introduction to Interactive Media`,
-    `This course provides an overview of media in historical, current and future contexts. Incorporating lectures and discussion with hands on work involving written and interactive media assets, students examine the role of written and visual media from theoretical as well as practical perspectives.  The course also provides an introduction to interactive media development techniques, including digital media components and delivery environments.  Students will be required to write formal analysis and critique papers along with digital modes of writing including collaborative editing and effective presentation design.
-  `
-  ),
-  "IGME-119": new Course("IGME-119", [attributeKeys.aesthetics, attributeKeys.creativity], [10, 5], 100, 3).setDetails(
+  "IGME-119": new Course("IGME-119", [attributeKeys.aesthetics, attributeKeys.creativity], [20, 10], 150, 1).setDetails(
     `2D Animation and Asset Production`,
     `This course provides a theoretical framework covering the principles of animation and its use in game design to affect user experience. Emphasis will be placed upon principles that support character development and animations that show cause and effect. Students will apply these principles to create animations that reflect movement and character appropriate for different uses and environments.
   `
   ),
+  "MATH-185": new Course("MATH-185", [attributeKeys.math, attributeKeys.aesthetics], [25, 15], 200, 1)
+    .setDetails(
+      "Mathematics of Graphical Simulation I",
+      "This is the first part of a two course sequence that aims at providing the mathematical tools needed to manipulate graphical objects and to model and simulate the physical properties of these objects. Topics from linear algebra, primarily in two and three dimensional space, analytic geometry, and calculus will be presented. The emphasis is on linear algebra, particularly its application to problems in geometry and graphical systems."
+    )
+    .addPreReq("MATH-131"),
+  "PHYS-111": new Course("PHYS-111", [attributeKeys.physics, attributeKeys.social], [40, 20], 300, 1).setDetails(
+    "College Physics I",
+    "This is an introductory course in algebra-based physics focusing on mechanics and waves. Topics include kinematics, planar motion, Newton’s laws, gravitation; rotational kinematics and dynamics; work and energy; momentum and impulse; conservation laws; simple harmonic motion; waves; data presentation/analysis and error propagation. The course is taught using both traditiona lectures and a workshop format that integrates material traditionally found in separate lecture, recitation, and laboratory settings."
+  ),
   "IGME-202": new Course(
     "IGME-202",
     [attributeKeys.programming, attributeKeys.creativity, attributeKeys.math, attributeKeys.physics],
-    [15, 5, 5, 5],
-    200,
-    4
+    [40, 10, 10, 10],
+    400,
+    2
   )
     .setDetails(
       `Interactive Media Development`,
@@ -107,25 +121,12 @@ const courseConfigs = {
   `
     )
     .addPreReq("IGME-106", "MATH-185"),
-  "IGME-209": new Course(
-    "IGME-209",
-    [attributeKeys.programming, attributeKeys.physics, attributeKeys.math],
-    [20, 10, 10],
-    300,
-    4
-  )
-    .setDetails(
-      `Data Structures & Algorithms for Games & Simulations I`,
-      `This course focuses upon the application of data structures, algorithms, and fundamental Newtonian physics to the development of video game applications, entertainment software titles, and simulations.  Topics covered include 3D coordinate systems and the implementation of affine transformations, geometric primitives, and efficient data structures and algorithms for real-time collision detection. Furthermore, Newtonian mechanics principles will be examined in the context of developing game and entertainment software where they will be applied to compute the position, velocity and acceleration of a point-mass subject to forces and the conservation of momentum and energy.  Programming assignments are a required part of this course.
-  `
-    )
-    .addPreReq("IGME-106"),
   "IGME-219": new Course(
     "IGME-219",
     [attributeKeys.aesthetics, attributeKeys.physics, attributeKeys.creativity],
-    [20, 10, 20],
-    400,
-    4
+    [50, 25, 50],
+    600,
+    2
   )
     .setDetails(
       `3D Animation and Asset Production`,
@@ -133,36 +134,59 @@ const courseConfigs = {
   `
     )
     .addPreReq("IGME-119"),
-  "IGME-220": new Course(
-    "IGME-220",
-    [attributeKeys.aesthetics, attributeKeys.creativity, attributeKeys.mentality],
-    [30, 40, 20],
-    600,
-    5
-  ).setDetails(
-    `Game Design & Development I`,
-    `This course examines the core process of game design, from ideation and structured brainstorming in an entertainment technology context through the examination of industry standard processes and techniques for documenting and managing the design process.  This course specifically examines techniques for assessing and quantifying the validity of a given design, for managing innovation and creativity in a game development-specific context, and for world and character design.  Specific emphasis is placed on both the examination and deconstruction of historical successes and failures, along with presentation of ethical and cultural issues related to the design and development of interactive software and the role of individuals in a team-oriented design methodology.  Students in this class are expected to actively participate and engage in the culture of design and critique as it relates to the field.
-  `
-  ),
   "IGME-235": new Course(
     "IGME-235",
     [attributeKeys.programming, attributeKeys.aesthetics, attributeKeys.creativity, attributeKeys.mentality],
-    [30, 30, 40, 30],
-    800,
-    5
+    [80, 60, 60, 40],
+    1000,
+    2
   )
     .setDetails(
       `Intro to Game Web Tech`,
       `This course introduces web technologies commonly used in the production and distribution of both content focused web sites, and in the creation of interactive applications and games. Students will create web sites and web-native interactive experiences, and publish them to the web. Programming projects are required.
-  `
+    `
     )
     .addPreReq("IGME-106", "IGME-110"),
+  "MATH-181": new Course(
+    "MATH-181",
+    [attributeKeys.math, attributeKeys.social, attributeKeys.mentality],
+    [120, 80, 100],
+    1200,
+    2
+  ).setDetails(
+    "Project-Based Calculus I",
+    "This is the first in a two-course sequence intended for students majoring in mathematics, science, or engineering.  It emphasizes the understanding of concepts, and using them to solve physical problems.  The course covers functions, limits, continuity, the derivative, rules of differentiation, applications of the derivative, Riemann sums, definite integrals, and indefinite integrals."
+  ),
+  "IGME-209": new Course(
+    "IGME-209",
+    [attributeKeys.programming, attributeKeys.physics, attributeKeys.math],
+    [200, 100, 100],
+    1500,
+    2
+  )
+    .setDetails(
+      `Data Structures & Algorithms for Games & Simulations I`,
+      `This course focuses upon the application of data structures, algorithms, and fundamental Newtonian physics to the development of video game applications, entertainment software titles, and simulations.  Topics covered include 3D coordinate systems and the implementation of affine transformations, geometric primitives, and efficient data structures and algorithms for real-time collision detection. Furthermore, Newtonian mechanics principles will be examined in the context of developing game and entertainment software where they will be applied to compute the position, velocity and acceleration of a point-mass subject to forces and the conservation of momentum and energy.  Programming assignments are a required part of this course.
+  `
+    )
+    .addPreReq("IGME-106"),
+  "IGME-220": new Course(
+    "IGME-220",
+    [attributeKeys.aesthetics, attributeKeys.creativity, attributeKeys.mentality],
+    [250, 80, 150],
+    1680,
+    2
+  ).setDetails(
+    `Game Design & Development I`,
+    `This course examines the core process of game design, from ideation and structured brainstorming in an entertainment technology context through the examination of industry standard processes and techniques for documenting and managing the design process.  This course specifically examines techniques for assessing and quantifying the validity of a given design, for managing innovation and creativity in a game development-specific context, and for world and character design.  Specific emphasis is placed on both the examination and deconstruction of historical successes and failures, along with presentation of ethical and cultural issues related to the design and development of interactive software and the role of individuals in a team-oriented design methodology.  Students in this class are expected to actively participate and engage in the culture of design and critique as it relates to the field.
+    `
+  ),
   "IGME-236": new Course(
     "IGME-236",
     [attributeKeys.aesthetics, attributeKeys.social, attributeKeys.mentality],
-    [60, 30, 40],
-    800,
-    5
+    [400, 150, 150],
+    2300,
+    2
   )
     .setDetails(
       `Experience Design for Games & Media
@@ -174,9 +198,9 @@ const courseConfigs = {
   "IGME-309": new Course(
     "IGME-309",
     [attributeKeys.programming, attributeKeys.physics, attributeKeys.math, attributeKeys.mentality],
-    [100, 50, 50, 75],
-    1500,
-    8
+    [400, 150, 150, 200],
+    4320,
+    3
   )
     .setDetails(
       `Data Structures & Algorithms for Games & Simulations II`,
@@ -186,9 +210,9 @@ const courseConfigs = {
   "IGME-320": new Course(
     "IGME-320",
     [attributeKeys.aesthetics, attributeKeys.creativity, attributeKeys.mentality, attributeKeys.social],
-    [100, 60, 60, 60],
-    2000,
-    8
+    [500, 300, 200, 200],
+    5400,
+    3
   )
     .setDetails(
       `Game Design & Development II`,
@@ -198,9 +222,9 @@ const courseConfigs = {
   "IGME-330": new Course(
     "IGME-330",
     [attributeKeys.programming, attributeKeys.aesthetics, attributeKeys.creativity, attributeKeys.mentality],
-    [120, 80, 80, 80],
-    2500,
-    8
+    [800, 600, 400, 300],
+    1e4,
+    3
   )
     .setDetails(
       `Rich Media Web Application Development I`,
@@ -217,9 +241,9 @@ const courseConfigs = {
       attributeKeys.creativity,
       attributeKeys.research,
     ],
-    [150, 150, 60, 60, 150, 10],
-    5000,
-    10
+    [1000, 1000, 300, 300, 500, 10],
+    2e4,
+    5
   )
     .setDetails(
       `Aesthetics and Computation`,
