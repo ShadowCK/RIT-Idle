@@ -397,15 +397,15 @@ body {
   display: grid;
   padding: 10px;
   gap: 20px;
-  /* Note: the repeat dimensions should be consistent with upgrade's frame dimensions */
-  grid-template-columns: repeat(auto-fit, 100px);
-  grid-template-rows: repeat(auto-fit, 100px);
+  /* Note: the repeat dimensions should be consistent with upgrade's frame dimensions, that is "100px" here. */
+  grid-template-columns: repeat(auto-fit, 64px);
+  grid-template-rows: repeat(auto-fit, 64px);
   grid-auto-flow: row;
 }
 
 .upgrade {
-  width: 100px;
-  height: 100px;
+  width: 64px;
+  height: 64px;
   background-color: #8a8a7f;
   border: solid 2px black;
 
@@ -425,6 +425,10 @@ body {
 
 .upgrade[data-bought="true"] {
   background-color: #2fc418;
+}
+
+.upgrade[data-cannot-afford][data-bought="true"] {
+  background-color: #ffc107;
 }
 
 @keyframes overlay {

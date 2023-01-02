@@ -524,9 +524,9 @@ function createUpgrades() {
     div.addEventListener("mouseenter", (e) => updateInfoBoard_mouseEnterUpgrade(div));
     div.addEventListener("mouseleave", clearInfoBoard);
 
-    let imageOverlay = document.createElement("img", { class: "overlay", src: `images/upgrade${index}.png` });
-
-    HTMLUpgrades.append(div.append_chain(imageOverlay));
+    // let imageOverlay = document.createElement("img", { class: "overlay", src: `images/upgrade${index}.png` });
+    //HTMLUpgrades.append(div.append_chain(imageOverlay));
+    HTMLUpgrades.append(div);
     upgrade.element = this;
 
     index++;
