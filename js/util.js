@@ -526,11 +526,22 @@ class StringParser {
 }
 
 /**
- * @param {string} string
- * @returns whether the input string is valid (false if `string` is falsy, "undefined" or "null")
+ * @param {string | *} string May be a valid string, or not a string at all.
+ * @returns {boolean} Whether `string` is a valid string (false if `string` is not a string, empty, "undefined" or "null")
  */
 function isValidString(string) {
-  return string && string !== "undefined" && string !== "null";
+  if (!!!string || (typeof string !== "string" && !string instanceof String)) {
+    return false;
+  }
+  return string != "undefined" && string != "null";
+}
+
+/**
+ * @param {*} string May be a string.
+ * @returns {boolean} Whether `string` is a string.
+ */
+function isString(string) {
+  return typeof string === "string" || string instanceof String;
 }
 
 /**
@@ -658,3 +669,23 @@ function setInnerHTML(element, newHTML) {
   if (element.innerHTML === newHTML) return;
   element.innerHTML = newHTML;
 }
+
+/**
+ * Sets the inline styles together to avoid multiple statements of element.style.aaa="bbb".
+ * @param {Map<string, string>} styles Object literal as a map
+ * @returns {HTMLElement} this
+ */
+HTMLElement.prototype.setInlineStyle = function (styles) {
+  // Not an object
+  if (typeof styles !== "object") {
+    console.log(`Input styles "${styles}" is not a valid object literal or Map!`);
+    return;
+  }
+  for (const [key, value] of Object.entries(styles)) {
+    // Wrong key
+    if (this.style[key] === undefined) continue;
+    // In case the value is not a string, converts it.
+    this.style[key] = value.toString();
+  }
+  return this;
+};

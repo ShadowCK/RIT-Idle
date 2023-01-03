@@ -282,6 +282,11 @@ body {
   cursor: grab;
 }
 
+.course[data-active="true"] .bar,
+.attribute[data-active="true"] .bar {
+  cursor: progress;
+}
+
 .course .bar:hover,
 .attribute .bar:hover {
   background-color: rgb(188, 188, 188);

@@ -238,6 +238,7 @@ function init() {
 
     for (let i = 0; i < num; i++) {
       // Creates drop
+      /** @type {DOMExtension.HTMLElement} */
       let drop = document.createElement("div", { class: "drop" });
       const containerID = "container-drops";
       // Adds the drop to a container, which is the whole page here.
@@ -247,7 +248,6 @@ function init() {
       container.append(drop);
       // Sets a random color;
       let RG = Math.random() * 50 + 173;
-      drop.style.backgroundColor = `rgb(${RG}, ${RG}, 255)`;
       // Sets the drop's location
       // By adding a small portion outside of the window that will be clamped to the corners,
       // the water drops look more realistic (otherwise the corners look empty!)
@@ -255,18 +255,25 @@ function init() {
         Math.random() * (container.offsetWidth - radius + container.offsetWidth * 0.05 * 2) -
         container.offsetWidth * 0.05;
       xOffset = clamp(xOffset, 0, container.offsetWidth - radius);
-      drop.style.left = xOffset + "px";
-      drop.style.top = `${-radius}px`;
-      drop.style.opacity = "1"; // Unnecessary: default value is 1. But here for better readability.
+
+      drop.setInlineStyle({
+        left: xOffset + "px",
+        top: `${-radius}px`,
+        backgroundColor: `rgb(${RG}, ${RG}, 255)`,
+        opacity: 1,
+      });
 
       // Utilizes setTimeOut and CSS transition to realize the "falling" animation;
-      // Could have used gameLoop() as well. But there's no actual need to sync with gameLoop(),
+      // TODO: Could have used gameLoop() as well. But there's no actual need to sync with gameLoop(),
       // as the game is in HTML... However, setting a timeout for each drop can be extremely
       // resource-consuming; implementing it in gameLoop() definitely helps.
-      drop.style.top = container.offsetHeight + "px"; // Setting top to another value triggers the transition!
-      drop.style.opacity = "0"; // Same!
       let delay = Math.random() * 5 + 5;
-      drop.style.transition = `all ${delay}s ease-in`;
+      drop.setInlineStyle({
+        top: container.offsetHeight + "px",
+        opacity: 0,
+        transition: `all ${delay}s ease-in`,
+      });
+
       setTimeout(() => {
         container.removeChild(drop);
       }, delay * 1000);
@@ -532,11 +539,18 @@ function createUpgrades() {
 
 /**
  * Sets the active attribute for display purpose
- * @param {*} attributeKey Attribute Name
+ * @param {string} attributeKey Attribute Name
  */
 function setActiveAttribute(attributeKey) {
-  if (!attributes[attributeKey]) {
+  const target = attributes[attributeKey];
+  // Invalid attribute key
+  if (!target) {
     console.log(`No attribute with name "${attributeKey} exists!"`);
+    return;
+  }
+
+  // Target attribute is already active. Safe when no active attribute is set.
+  if (target === getActiveAttribute()) {
     return;
   }
 
@@ -637,6 +651,11 @@ function setActiveCourse(courseKey, playSound = true) {
     return;
   }
 
+  // Target course is already an active course. Safe when no active course is set.
+  if (target === getActiveCourse()) {
+    return;
+  }
+
   // Pre-reqs not met.
   if (!target.hasMetPreReqs()) {
     sendError(`You can't take this course right now. Must have C- or better in the pre-requisites.`);
@@ -678,9 +697,9 @@ function updateCourses() {
   // Resets the inline styles for required attributes
   // TODO: may be better if just use HTML classes.
   for (const element of HTMLAttributes.children) {
+    /** @type {DOMExtension.HTMLElement} */
     let text = element.querySelector(".text");
-    text.style.color = "";
-    text.style.padding = "";
+    text.setInlineStyle({ color: "", padding: "" });
   }
 
   // Adds progress to the active course
@@ -709,10 +728,11 @@ function updateCourses() {
     // Always updates HTML element for visuals (progress and base value may be added in other ways)
     element.querySelector(".progress").style.width = `${course.getProgressPercentage()}%`;
 
-    updateCourseText(element.querySelector(".text"), course);
-
-    // If player is hovering over the course, highlight the required attributes and display completions until next exam.
-    if (element.querySelector(".bar").matches(":hover")) {
+    if (!element.querySelector(".bar").matches(":hover")) {
+      updateCourseText(element.querySelector(".text"), course);
+    }
+    // If player is hovering over the course, highlight the required attributes and display completions until next exam as course text.
+    else {
       // ! course.completionsTilExam evaluates a formula, which is expensive.
       // TODO: Update the text every second instead of every frame.
       setInnerHTML(element.querySelector(".text"), `Exam: ${formatNumber(course.completionsTilExam)} completions left`);
@@ -721,8 +741,7 @@ function updateCourses() {
         const attribute = attributes[key];
         const value = course.reqAttributeValues[i];
         const text = attribute.element.querySelector(".text");
-        text.style.color = "rgb(15, 176, 162)";
-        text.style.padding = "2px";
+        text.setInlineStyle({ color: "rgb(15, 176, 162)", padding: "2px" });
         setInnerHTML(
           text,
           `${attribute.name}: ${formatNumber(
@@ -936,15 +955,14 @@ function calculateOfflineIncome(offlineTime) {
 
   let p = pausedPrompt.querySelector("p");
   // Cancels transition for this one (or the visual looks weird)
-  p.style.transition = "none";
-  p.style.fontSize = "2em";
+  p.setInlineStyle({ transition: "none", fontSize: "2em" });
   setInnerHTML(
     p,
     `You're back!<br>For the past <span style="color:white;">${getTimeString(
       offlineTime
     )}</span> (capped at 24h),<br>you earned <span style="color:white;">${income.toFixed()}</span> tiger spirits!`
   );
-  // Had to set a delay; otherwise the transition still plays for the first time (but not for later.) Weird.
+  // Had to set a delay to set the transition to "" again; otherwise the transition still plays for the first time (but not for later.) Weird.
   setTimeout(() => {
     p.style.transition = "";
   }, 20);

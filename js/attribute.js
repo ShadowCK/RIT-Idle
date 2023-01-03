@@ -1,6 +1,6 @@
 /**
  * Gets the active attribute
- * @returns object of the active attribute (being trained)
+ * @returns {Attribute} object of the active attribute (being trained)
  */
 function getActiveAttribute() {
   return attributes[activeAttributeName];
@@ -8,7 +8,7 @@ function getActiveAttribute() {
 
 /**
  * If activeAttributeName is set and an attribute with that name is valid.
- * @returns Whether an active attribute is set or not
+ * @returns {boolean} Whether an active attribute is set or not
  */
 function hasActiveAttribute() {
   return !!activeAttributeName && !!attributes[activeAttributeName];

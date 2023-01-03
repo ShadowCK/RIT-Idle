@@ -3,6 +3,6 @@
     "module": "commonjs",
     "target": "ES2022",
   },
-  "include": ["js/**/*.js", "js/my-lib.d.ts"],
+  "include": ["js/**/*.js", "js/extension-doc.d.ts"],
   "exclude": ["js/module"]
 }

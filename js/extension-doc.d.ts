@@ -84,6 +84,13 @@ declare namespace DOMExtension {
      * @returns If the element's dataset contains a variable named as `key`, with specified value.
      */
     containsData(key: string, value: string | any);
+
+    /**
+     * Sets the inline styles together to avoid multiple statements of element.style.aaa="bbb".
+     * @param styles Object literal as a map
+     * @returns this
+     */
+    setInlineStyle(styles: Map<string, string>): HTMLElement;
   }
 
   /**
@@ -107,6 +114,12 @@ declare namespace DOMExtension {
 
 // // * This also works, although such syntax is not regulated.
 // // * Reason: because no TypeScript complier exists, declarations here only act as documentation for IntelliSense.
+// // ! However, I prefer this because it directly writes documentation to the type without @type {DOMExtension.XXX}
+// // ? Maybe get rid of the namespace so the codes are clearer without extra comments (though I still think it's imformal.)
+// // Or not. Even if the variable is not typed by comment, when you write anyVariable.someFunction(.. it displays the .d.ts declaration.
+// // Note the function declaration won't display with anyVariable.someF... , only if you've entered the ( to imply it's a function.
+// // And the IntelliSense only shows up during filling the parameters. If you hover over it, no info shows up.
+// // In addition, it does NOT work for a property, only functions with the same name.
 // declare interface HTMLElement {
 //   newProperty: string;
 //   newMethod(): void;
